@@ -13,6 +13,54 @@ import { runAutonomyLoop } from '../ai/autonomy_loop.js'
  * 1. Send scheduled follow-ups
  * 2. Generate daily AI COO report
  */
+async function checkOverdueTasks() {
+  console.log('Checking for overdue tasks and triggering workflows...')
+
+  // Find all overdue tasks
+  const overdueTasks = await prisma.task.findMany({
+    where: {
+      status: 'PENDING',
+      dueDate: {
+        lt: new Date(), // Due date is in the past
+      },
+    },
+    include: {
+      user: true,
+    },
+  })
+
+  // Group by user and trigger workflows
+  const tasksByUser = {}
+  for (const task of overdueTasks) {
+    if (!tasksByUser[task.userId]) {
+      tasksByUser[task.userId] = []
+    }
+    tasksByUser[task.userId].push(task)
+  }
+
+  // Trigger task_overdue workflows for each user
+  for (const [userId, tasks] of Object.entries(tasksByUser)) {
+    for (const task of tasks) {
+      try {
+        await processWorkflowTrigger(userId, 'task_overdue', {
+          taskId: task.id,
+          title: task.title,
+          description: task.description,
+          priority: task.priority,
+          dueDate: task.dueDate,
+          taskTitle: task.title,
+          contactName: task.title, // Fallback if no contact name
+        })
+        console.log(`Triggered task_overdue workflow for task: ${task.title} (User: ${userId})`)
+      } catch (error) {
+        console.error(`Error triggering workflow for task ${task.id}:`, error)
+      }
+    }
+  }
+
+  console.log(`Checked ${overdueTasks.length} overdue tasks across ${Object.keys(tasksByUser).length} users`)
+}
+
 async function processFollowUps() {
   console.log('Processing scheduled follow-ups...')
 
@@ -249,6 +297,9 @@ async function runAutonomyLoops() {
 
 async function main() {
   console.log('Starting cron jobs...')
+  
+  // Check for overdue tasks first (triggers workflows)
+  await checkOverdueTasks()
   
   await processFollowUps()
   await generateDailyReport()

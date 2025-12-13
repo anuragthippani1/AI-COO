@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }) {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-8">
+        <main className="flex-1 min-h-screen">
           {children}
         </main>
       </div>

@@ -47,30 +47,30 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Total Tasks</h3>
-          <p className="text-3xl font-bold">{data.stats.tasks.total}</p>
+          <p className="text-3xl font-bold">{data.stats?.tasks?.total || 0}</p>
           <p className="text-sm text-gray-600 mt-2">
-            {data.stats.tasks.pending} pending
+            {data.stats?.tasks?.pending || 0} pending
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Unread Emails</h3>
-          <p className="text-3xl font-bold">{data.stats.emails.unread}</p>
+          <p className="text-3xl font-bold">{data.stats?.emails?.unread || 0}</p>
           <p className="text-sm text-gray-600 mt-2">
-            {data.stats.emails.total} total
+            {data.stats?.emails?.total || 0} total
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Pending Follow-ups</h3>
-          <p className="text-3xl font-bold">{data.stats.followUps.pending}</p>
+          <p className="text-3xl font-bold">{data.stats?.followUps?.pending || 0}</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Revenue</h3>
-          <p className="text-3xl font-bold">{formatCurrency(data.stats.invoices.revenue)}</p>
+          <p className="text-3xl font-bold">{formatCurrency(data.stats?.invoices?.revenue || 0)}</p>
           <p className="text-sm text-gray-600 mt-2">
-            {data.stats.invoices.total} invoices
+            {data.stats?.invoices?.total || 0} invoices
           </p>
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-semibold">Recent Tasks</h2>
         </div>
         <div className="p-6">
-          {data.recentTasks.length === 0 ? (
+          {!data.recentTasks || data.recentTasks.length === 0 ? (
             <p className="text-gray-500">No tasks yet</p>
           ) : (
             <div className="space-y-4">
@@ -111,7 +111,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-semibold">Upcoming Follow-ups</h2>
         </div>
         <div className="p-6">
-          {data.upcomingFollowUps.length === 0 ? (
+          {!data.upcomingFollowUps || data.upcomingFollowUps.length === 0 ? (
             <p className="text-gray-500">No follow-ups scheduled</p>
           ) : (
             <div className="space-y-4">

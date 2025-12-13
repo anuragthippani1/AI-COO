@@ -12,22 +12,33 @@ export default function InboxPage() {
     fetchEmails()
   }, [])
 
-  const fetchEmails = async () => {
+  const fetchEmails = async (refresh = false) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch('/api/emails/fetch', {
+      
+      // If refresh, fetch new emails from Gmail
+      if (refresh) {
+        const fetchResponse = await fetch('/api/emails/fetch', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        
+        if (fetchResponse.status === 400) {
+          const data = await fetchResponse.json()
+          if (data.error?.includes('Gmail not connected')) {
+            alert('Gmail not connected. Please connect in Settings.')
+            return
+          }
+        }
+      }
+      
+      // Always fetch from database
+      const response = await fetch('/api/emails/list?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
       })
       
       if (response.ok) {
         const data = await response.json()
         setEmails(data.emails || [])
-      } else if (response.status === 400) {
-        const data = await response.json()
-        if (data.error?.includes('Gmail not connected')) {
-          // Show message but don't set error state
-          console.log('Gmail not connected')
-        }
       }
     } catch (error) {
       console.error('Error fetching emails:', error)
@@ -42,13 +53,22 @@ export default function InboxPage() {
         <h1 className="text-3xl font-bold mb-6">Inbox</h1>
         
         <div className="mb-4 flex justify-between items-center">
-          <button
-            onClick={fetchEmails}
-            disabled={loading}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
-          >
-            {loading ? 'Loading...' : 'Refresh Emails'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => fetchEmails(true)}
+              disabled={loading}
+              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+            >
+              {loading ? 'Loading...' : 'Fetch from Gmail'}
+            </button>
+            <button
+              onClick={() => fetchEmails(false)}
+              disabled={loading}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
 
         {loading ? (

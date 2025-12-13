@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { runAgent } from '@/ai/agent_manager'
 import { saveMemory } from '@/lib/memory'
 import { processWorkflowTrigger } from '@/lib/workflow_engine'
+import { processAutoResponse } from '@/ai/auto_response'
 
 export async function GET(request) {
   try {
@@ -56,6 +57,17 @@ export async function GET(request) {
         }
       )
 
+      // Check for auto-response first
+      const autoResponse = await processAutoResponse(
+        userId,
+        email.body,
+        'email',
+        {
+          from: email.from,
+          subject: email.subject,
+        }
+      )
+
       // Process with AI agent
       const agentResponse = await runAgent({
         userId,
@@ -66,6 +78,7 @@ export async function GET(request) {
           from: email.from,
           to: email.to,
           subject: email.subject,
+          autoResponseMatched: autoResponse.matched,
         },
       })
 

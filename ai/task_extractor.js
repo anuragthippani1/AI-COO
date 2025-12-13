@@ -43,20 +43,29 @@ Return format:
 
     const tasks = JSON.parse(jsonMatch[0])
 
+    // Use priority from metadata if provided (from priority engine)
+    const basePriority = metadata.priority || 'MEDIUM'
+
     // Save tasks to database
     const createdTasks = []
     for (const task of tasks) {
+      // Use thread insights if available
+      const taskPriority = metadata.threadInsights?.hiddenTasks?.find(
+        (t) => t.title === task.title
+      )?.priority || task.priority || basePriority
+
       const created = await prisma.task.create({
         data: {
           userId,
           title: task.title,
           description: task.description,
-          priority: task.priority,
+          priority: taskPriority,
           dueDate: task.dueDate ? new Date(task.dueDate) : null,
           source: 'email',
           sourceId: metadata.messageId,
           metadata: {
             assignee: task.assignee,
+            threadInsights: metadata.threadInsights,
             ...metadata,
           },
         },

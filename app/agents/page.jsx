@@ -4,56 +4,30 @@ import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 
 export default function AgentsPage() {
-  const [agents] = useState([
-    {
-      id: '1',
-      name: 'Inbox Agent',
-      description: 'Reads, sorts, classifies emails and extracts tasks automatically',
-      status: 'active',
-      lastRun: '2 minutes ago',
-      capabilities: ['Email reading', 'Classification', 'Task extraction', 'Priority detection'],
-    },
-    {
-      id: '2',
-      name: 'Reply Agent',
-      description: 'Writes professional customer replies matching your tone',
-      status: 'active',
-      lastRun: '5 minutes ago',
-      capabilities: ['Reply generation', 'Tone matching', 'Context awareness'],
-    },
-    {
-      id: '3',
-      name: 'Follow-Up Agent',
-      description: 'Sends automated follow-ups via WhatsApp and email',
-      status: 'active',
-      lastRun: '1 hour ago',
-      capabilities: ['WhatsApp messaging', 'Email follow-ups', 'Auto-stop on reply'],
-    },
-    {
-      id: '4',
-      name: 'Proposal Agent',
-      description: 'Creates professional proposals based on services and context',
-      status: 'active',
-      lastRun: 'Never',
-      capabilities: ['Proposal generation', 'PDF creation', 'Auto-send'],
-    },
-    {
-      id: '5',
-      name: 'Invoice Agent',
-      description: 'Creates invoices and tracks payment status',
-      status: 'active',
-      lastRun: 'Never',
-      capabilities: ['Invoice generation', 'PDF creation', 'Payment tracking'],
-    },
-    {
-      id: '6',
-      name: 'Memory Agent',
-      description: 'Learns your writing tone, preferences, and business context',
-      status: 'active',
-      lastRun: 'Continuous',
-      capabilities: ['Tone learning', 'Context storage', 'Preference tracking'],
-    },
-  ])
+  const [agents, setAgents] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchAgents()
+  }, [])
+
+  const fetchAgents = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/agents/status', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setAgents(data.agents || [])
+      }
+    } catch (error) {
+      console.error('Error fetching agents:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -65,8 +39,15 @@ export default function AgentsPage() {
           </button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {agents.map((agent) => (
+        {loading ? (
+          <div className="text-center py-12">Loading agents...</div>
+        ) : agents.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <p className="text-gray-500">No agents available</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agents.map((agent) => (
             <div
               key={agent.id}
               className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition"
@@ -101,6 +82,11 @@ export default function AgentsPage() {
               )}
               <div className="text-sm text-gray-500 mb-4">
                 Last run: {agent.lastRun}
+                {agent.activityCount > 0 && (
+                  <span className="ml-2 text-green-600">
+                    ({agent.activityCount} actions in last 24h)
+                  </span>
+                )}
               </div>
               <div className="flex space-x-2">
                 <button className="flex-1 bg-primary-50 text-primary-600 px-4 py-2 rounded hover:bg-primary-100">
@@ -112,7 +98,8 @@ export default function AgentsPage() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )

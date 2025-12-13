@@ -3,6 +3,10 @@ import { sendWhatsAppMessage } from '../lib/whatsapp.js'
 import { sendEmail } from '../lib/gmail.js'
 import { generateReply } from '../ai/reply_generator.js'
 import { processWorkflowTrigger } from '../lib/workflow_engine.js'
+import { checkUnpaidInvoices } from '../lib/finance.js'
+import { runAutonomousMode } from '../ai/autonomy_engine.js'
+import { analyzeBusinessOperations } from '../ai/business_operations.js'
+import { runAutonomyLoop } from '../ai/autonomy_loop.js'
 
 /**
  * Daily cron job to:
@@ -107,6 +111,7 @@ async function generateDailyReport() {
         unreadEmails,
         pendingFollowUps,
         todayRevenue,
+        businessInsights,
       ] = await Promise.all([
         prisma.task.count({
           where: {
@@ -140,6 +145,13 @@ async function generateDailyReport() {
           },
           _sum: { total: true },
         }),
+        prisma.businessInsight.count({
+          where: {
+            userId: user.id,
+            createdAt: { gte: today },
+            priority: 'high',
+          },
+        }),
       ])
 
       const report = `
@@ -150,6 +162,7 @@ async function generateDailyReport() {
 📧 Unread Emails: ${unreadEmails}
 💬 Pending Follow-ups: ${pendingFollowUps}
 💰 Today's Revenue: $${todayRevenue._sum.total || 0}
+🔔 High-Priority Insights: ${businessInsights}
 
 Have a productive day!
       `.trim()
@@ -162,11 +175,86 @@ Have a productive day!
   }
 }
 
+async function runAutonomousOperations() {
+  console.log('Running autonomous operations...')
+
+  const users = await prisma.user.findMany({
+    where: {
+      subscription: {
+        tier: 'AI_COO', // Only for AI COO tier
+      },
+    },
+  })
+
+  for (const user of users) {
+    try {
+      await runAutonomousMode(user.id, {
+        inboxMaintenance: true,
+        followUpCycle: true,
+        proposalGeneration: true,
+        dailyDecisions: true,
+      })
+      console.log(`Autonomous operations completed for user ${user.id}`)
+    } catch (error) {
+      console.error(`Error running autonomous operations for user ${user.id}:`, error)
+    }
+  }
+}
+
+async function checkFinancialHealth() {
+  console.log('Checking financial health...')
+
+  const users = await prisma.user.findMany()
+
+  for (const user of users) {
+    try {
+      // Check unpaid invoices
+      await checkUnpaidInvoices(user.id)
+
+      // Analyze business operations
+      await analyzeBusinessOperations(user.id)
+
+      console.log(`Financial health check completed for user ${user.id}`)
+    } catch (error) {
+      console.error(`Error checking financial health for user ${user.id}:`, error)
+    }
+  }
+}
+
+async function runAutonomyLoops() {
+  console.log('Running autonomy loops for all users...')
+
+  const users = await prisma.user.findMany({
+    where: {
+      subscription: {
+        tier: 'AI_COO', // Only for AI COO tier
+      },
+    },
+  })
+
+  for (const user of users) {
+    try {
+      await runAutonomyLoop(user.id, {
+        interval: 5 * 60 * 1000, // 5 minutes
+        maxActions: 10,
+        enabled: true,
+        continuous: false, // Run once per cron
+      })
+      console.log(`Autonomy loop completed for user ${user.id}`)
+    } catch (error) {
+      console.error(`Error running autonomy loop for user ${user.id}:`, error)
+    }
+  }
+}
+
 async function main() {
   console.log('Starting cron jobs...')
   
   await processFollowUps()
   await generateDailyReport()
+  await runAutonomousOperations()
+  await checkFinancialHealth()
+  await runAutonomyLoops() // New advanced autonomy loop
   
   console.log('Cron jobs completed')
   process.exit(0)

@@ -38,28 +38,32 @@ enum EmailStatus {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  passwordHash  String?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String?
+  image        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // OAuth
-  accounts      Account[]
-  sessions      Session[]
+  accounts Account[]
+  sessions Session[]
 
   // Subscriptions
-  subscription  Subscription?
+  subscription Subscription?
 
   // Data
-  tasks         Task[]
-  emails        Email[]
-  memories      Memory[]
-  invoices      Invoice[]
-  followUps     FollowUp[]
-  workflows     Workflow[]
+  tasks            Task[]
+  emails           Email[]
+  memories         Memory[]
+  invoices         Invoice[]
+  followUps        FollowUp[]
+  workflows        Workflow[]
+  notifications    Notification[]
+  expenses         Expense[]
+  businessInsights BusinessInsight[]
+  autoResponses    AutoResponse[]
 
   @@map("users")
 }
@@ -67,7 +71,7 @@ model User {
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  type             String
+  type              String
   provider          String
   providerAccountId String
   refresh_token     String? @db.Text
@@ -95,16 +99,16 @@ model Session {
 }
 
 model Subscription {
-  id                String          @id @default(cuid())
-  userId            String          @unique
-  tier              SubscriptionTier @default(FREE)
-  stripeCustomerId  String?         @unique
-  stripeSubscriptionId String?      @unique
-  stripePriceId     String?
-  status            String?         // active, canceled, past_due
-  currentPeriodEnd  DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id                   String           @id @default(cuid())
+  userId               String           @unique
+  tier                 SubscriptionTier @default(FREE)
+  stripeCustomerId     String?          @unique
+  stripeSubscriptionId String?          @unique
+  stripePriceId        String?
+  status               String? // active, canceled, past_due
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -120,9 +124,9 @@ model Task {
   priority    TaskPriority @default(MEDIUM)
   dueDate     DateTime?
   completedAt DateTime?
-  source      String?      // email, manual, ai_generated
-  sourceId    String?      // email id or other source
-  metadata    Json?        // additional data
+  source      String? // email, manual, ai_generated
+  sourceId    String? // email id or other source
+  metadata    Json? // additional data
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -134,23 +138,23 @@ model Task {
 }
 
 model Email {
-  id            String     @id @default(cuid())
-  userId        String
-  messageId     String     @unique
-  threadId      String?
-  from          String
-  to            String
-  subject       String
-  body          String     @db.Text
-  htmlBody      String?    @db.Text
-  status        EmailStatus @default(UNREAD)
-  isProcessed   Boolean    @default(false)
-  extractedTasks Json?     // tasks extracted from email
-  aiReply       String?    @db.Text
-  metadata      Json?      // labels, attachments, etc.
-  receivedAt    DateTime   @default(now())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id             String      @id @default(cuid())
+  userId         String
+  messageId      String      @unique
+  threadId       String?
+  from           String
+  to             String
+  subject        String
+  body           String      @db.Text
+  htmlBody       String?     @db.Text
+  status         EmailStatus @default(UNREAD)
+  isProcessed    Boolean     @default(false)
+  extractedTasks Json? // tasks extracted from email
+  aiReply        String?     @db.Text
+  metadata       Json? // labels, attachments, etc.
+  receivedAt     DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -160,14 +164,14 @@ model Email {
 }
 
 model Memory {
-  id          String   @id @default(cuid())
-  userId      String
-  text        String   @db.Text
-  embedding   String?  // vector embedding (stored as JSON string)
-  metadata    Json?    // type, source, tags, etc.
-  pineconeId  String?  @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  text       String   @db.Text
+  embedding  String? // vector embedding (stored as JSON string)
+  metadata   Json? // type, source, tags, etc.
+  pineconeId String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -177,22 +181,22 @@ model Memory {
 }
 
 model Invoice {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   userId        String
-  invoiceNumber String   @unique
+  invoiceNumber String    @unique
   clientName    String
   clientEmail   String?
-  items         Json     // array of {name, quantity, price, total}
+  items         Json // array of {name, quantity, price, total}
   subtotal      Float
   tax           Float     @default(0)
   total         Float
-  status        String   @default("draft") // draft, sent, paid, overdue
+  status        String    @default("draft") // draft, sent, paid, overdue
   pdfUrl        String?
   dueDate       DateTime?
   paidAt        DateTime?
   metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -201,20 +205,20 @@ model Invoice {
 }
 
 model FollowUp {
-  id            String   @id @default(cuid())
-  userId        String
-  leadName      String
-  leadPhone     String
-  leadEmail     String?
-  message       String   @db.Text
-  status        String   @default("pending") // pending, sent, replied, converted
-  scheduledFor  DateTime
-  sentAt        DateTime?
-  channel       String   @default("whatsapp") // whatsapp, email, sms
+  id                  String    @id @default(cuid())
+  userId              String
+  leadName            String
+  leadPhone           String
+  leadEmail           String?
+  message             String    @db.Text
+  status              String    @default("pending") // pending, sent, replied, converted
+  scheduledFor        DateTime
+  sentAt              DateTime?
+  channel             String    @default("whatsapp") // whatsapp, email, sms
   conversationHistory Json? // array of messages
-  metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  metadata            Json?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -228,8 +232,8 @@ model Workflow {
   userId      String
   name        String
   description String?  @db.Text
-  trigger     String   // email_received, task_created, time_based
-  actions     Json     // array of actions to execute
+  trigger     String // email_received, task_created, time_based
+  actions     Json // array of actions to execute
   isActive    Boolean  @default(true)
   metadata    Json?
   createdAt   DateTime @default(now())
@@ -241,5 +245,78 @@ model Workflow {
   @@map("workflows")
 }
 
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String    @default("info") // info, success, warning, error, reminder, urgent, lead
+  title     String
+  message   String    @db.Text
+  link      String?
+  read      Boolean   @default(false)
+  readAt    DateTime?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String // office, travel, marketing, software, other
+  description String
+  amount      Float
+  date        DateTime
+  receiptUrl  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, category])
+  @@map("expenses")
+}
+
+model BusinessInsight {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String // suggestion, risk, opportunity, trend
+  title       String
+  description String   @db.Text
+  priority    String   @default("medium") // low, medium, high
+  actionItems Json? // array of suggested actions
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId, createdAt])
+  @@map("business_insights")
+}
+
+model AutoResponse {
+  id        String   @id @default(cuid())
+  userId    String
+  trigger   String // keyword, question_type, email_pattern
+  pattern   String // regex or keyword to match
+  response  String   @db.Text
+  channel   String   @default("email") // email, whatsapp, sms
+  isActive  Boolean  @default(true)
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("auto_responses")
+}

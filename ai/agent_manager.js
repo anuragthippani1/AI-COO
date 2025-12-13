@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { extractTasksFromEmail } from './task_extractor'
 import { generateReply } from './reply_generator'
 import { scheduleFollowUp } from './followup_scheduler'
+import { analyzeEmailThread } from './email_thread_analyzer'
+import { computePriority } from './priority_engine'
 
 /**
  * Main agent runner - processes input and determines actions
@@ -75,19 +77,53 @@ async function handleEmail(input) {
   const emailContent = input.content
   const emailMetadata = input.metadata || {}
 
-  // Extract tasks
-  const tasks = await extractTasksFromEmail(input.userId, emailContent, emailMetadata)
+  // Analyze email thread if threadId available
+  let threadInsights = null
+  if (emailMetadata.threadId) {
+    try {
+      const threadAnalysis = await analyzeEmailThread(input.userId, emailMetadata.threadId)
+      if (threadAnalysis.success) {
+        threadInsights = threadAnalysis.insights
+      }
+    } catch (error) {
+      console.warn('Thread analysis failed:', error)
+    }
+  }
 
-  // Generate reply suggestion
-  const reply = await generateReply(input.userId, emailContent, emailMetadata)
+  // Compute priority using priority engine
+  const priorityResult = await computePriority(input.userId, {
+    type: 'email',
+    body: emailContent,
+    subject: emailMetadata.subject,
+    from: emailMetadata.from,
+    threadId: emailMetadata.threadId,
+  })
 
-  // Check if follow-up is needed
+  // Extract tasks (with priority and thread insights)
+  const tasks = await extractTasksFromEmail(input.userId, emailContent, {
+    ...emailMetadata,
+    priority: priorityResult.priority,
+    threadInsights,
+  })
+
+  // Generate reply (with thread context)
+  const reply = await generateReply(input.userId, emailContent, {
+    ...emailMetadata,
+    threadInsights,
+  })
+
+  // Check if follow-up is needed (with priority)
   let followUpAction = null
-  if (emailMetadata.needsFollowUp) {
+  if (emailMetadata.needsFollowUp || threadInsights?.followUpNeeds?.length > 0) {
     followUpAction = await scheduleFollowUp(
       input.userId,
       emailMetadata.from || '',
-      emailContent
+      emailContent,
+      {
+        ...emailMetadata,
+        priority: priorityResult.priority,
+        threadInsights,
+      }
     )
   }
 
@@ -97,6 +133,8 @@ async function handleEmail(input) {
       tasks,
       reply,
       followUp: followUpAction,
+      priority: priorityResult.priority,
+      threadInsights,
     },
     actions: [
       ...tasks.map((task) => ({

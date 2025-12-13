@@ -132,16 +132,16 @@ export default function Home() {
         <section className="container mx-auto px-4 py-20">
           <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {[
-              { label: 'Tasks Automated', value: '10K+', color: 'purple' },
-              { label: 'Emails Processed', value: '50K+', color: 'blue' },
-              { label: 'Follow-ups Sent', value: '25K+', color: 'purple' },
-              { label: 'Happy Users', value: '1K+', color: 'blue' },
+              { label: 'Tasks Automated', value: '10K+', gradient: 'from-purple-400 to-blue-400' },
+              { label: 'Emails Processed', value: '50K+', gradient: 'from-blue-400 to-purple-400' },
+              { label: 'Follow-ups Sent', value: '25K+', gradient: 'from-purple-400 to-blue-400' },
+              { label: 'Happy Users', value: '1K+', gradient: 'from-blue-400 to-purple-400' },
             ].map((stat, index) => (
               <div
                 key={index}
                 className="bg-white/5 backdrop-blur-md border border-purple-500/30 rounded-xl p-6 text-center hover:border-purple-400/50 transition-all duration-300 hover:scale-105"
               >
-                <div className={`text-4xl font-bold mb-2 bg-gradient-to-r from-${stat.color}-400 to-${stat.color === 'purple' ? 'blue' : 'purple'}-400 bg-clip-text text-transparent`}>
+                <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
                   {stat.value}
                 </div>
                 <div className="text-gray-400 text-sm">{stat.label}</div>

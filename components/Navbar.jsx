@@ -8,10 +8,17 @@ export default function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     setIsLoggedIn(!!token)
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleLogout = () => {
@@ -23,18 +30,27 @@ export default function Navbar() {
   const isActive = (path) => pathname === path
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-black/80 backdrop-blur-md border-b border-purple-500/30'
+          : 'bg-transparent'
+      }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-bold text-primary-600">
+          <Link
+            href="/"
+            className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300"
+          >
             AI COO
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
             <Link
               href="/#features"
-              className={`text-gray-600 hover:text-primary-600 transition ${
-                pathname === '/' ? 'text-primary-600' : ''
+              className={`text-gray-300 hover:text-purple-400 transition-colors duration-300 ${
+                pathname === '/' ? 'text-purple-400' : ''
               }`}
             >
               Features
@@ -43,24 +59,24 @@ export default function Navbar() {
               <>
                 <Link
                   href="/dashboard"
-                  className={`text-gray-600 hover:text-primary-600 transition ${
-                    isActive('/dashboard') ? 'text-primary-600 font-medium' : ''
+                  className={`text-gray-300 hover:text-purple-400 transition-colors duration-300 ${
+                    isActive('/dashboard') ? 'text-purple-400 font-medium' : ''
                   }`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/inbox"
-                  className={`text-gray-600 hover:text-primary-600 transition ${
-                    isActive('/inbox') ? 'text-primary-600 font-medium' : ''
+                  className={`text-gray-300 hover:text-purple-400 transition-colors duration-300 ${
+                    isActive('/inbox') ? 'text-purple-400 font-medium' : ''
                   }`}
                 >
                   Inbox
                 </Link>
                 <Link
                   href="/tasks"
-                  className={`text-gray-600 hover:text-primary-600 transition ${
-                    isActive('/tasks') ? 'text-primary-600 font-medium' : ''
+                  className={`text-gray-300 hover:text-purple-400 transition-colors duration-300 ${
+                    isActive('/tasks') ? 'text-purple-400 font-medium' : ''
                   }`}
                 >
                   Tasks
@@ -69,8 +85,8 @@ export default function Navbar() {
             ) : null}
             <Link
               href="/pricing"
-              className={`text-gray-600 hover:text-primary-600 transition ${
-                isActive('/pricing') ? 'text-primary-600 font-medium' : ''
+              className={`text-gray-300 hover:text-purple-400 transition-colors duration-300 ${
+                isActive('/pricing') ? 'text-purple-400 font-medium' : ''
               }`}
             >
               Pricing
@@ -78,7 +94,7 @@ export default function Navbar() {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-primary-600 transition"
+                className="text-gray-300 hover:text-purple-400 transition-colors duration-300"
               >
                 Logout
               </button>
@@ -86,15 +102,16 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-600 hover:text-gray-900 transition"
+                  className="text-gray-300 hover:text-white transition-colors duration-300"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-primary-100 text-gray-900 font-medium px-4 py-2 rounded-lg hover:bg-primary-200 transition"
+                  className="relative px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white font-medium overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(147,51,234,0.5)]"
                 >
-                  Get Started
+                  <span className="relative z-10">Get Started</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 hover:opacity-100 transition-opacity duration-300" />
                 </Link>
               </>
             )}
@@ -102,7 +119,7 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button className="text-gray-600">
+            <button className="text-gray-300 hover:text-purple-400 transition-colors">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -123,4 +140,3 @@ export default function Navbar() {
     </nav>
   )
 }
-

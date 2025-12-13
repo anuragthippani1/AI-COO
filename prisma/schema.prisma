@@ -64,6 +64,7 @@ model User {
   expenses         Expense[]
   businessInsights BusinessInsight[]
   autoResponses    AutoResponse[]
+  activityLogs    ActivityLog[]
 
   @@map("users")
 }
@@ -319,4 +320,27 @@ model AutoResponse {
 
   @@index([userId, isActive])
   @@map("auto_responses")
+}
+
+model ActivityLog {
+  id             String   @id @default(cuid())
+  userId         String
+  actionType     String // send_email, create_task, move_lead, etc.
+  agentName      String? // reply_agent, task_agent, etc.
+  status         String   @default("pending") // pending, completed, failed, rejected
+  confidenceScore Int? // 0-100
+  riskLevel      String? // low, medium, high
+  explanation    String?  @db.Text
+  inputData      Json? // Input context
+  outputData     Json? // Output/result
+  metadata       Json? // Additional data
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, actionType])
+  @@index([userId, status])
+  @@map("activity_logs")
 }

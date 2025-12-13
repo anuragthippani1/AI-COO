@@ -1,9 +1,15 @@
 import { getChatCompletion } from '@/lib/openai'
 import { prisma } from '@/lib/prisma'
 import { saveMemory } from '@/lib/memory'
+import { evaluateConfidence } from './confidence_engine'
+import { shouldRequireApproval, createApprovalRequest } from '@/lib/approval_manager'
+import { logActivity } from '@/lib/activity_logger'
+import { explainDecision } from './explainability_engine'
 
 export async function scheduleFollowUp(userId, contactInfo, context) {
   try {
+    // TODO: Add simulation mode check
+    // TODO: Add rate limit check
     const prompt = `Based on this conversation context, determine if a follow-up is needed and when.
 
 Context:
@@ -51,8 +57,67 @@ If no follow-up needed, return: {"needed": false}`
       channel: decision.channel || 'whatsapp',
     }
 
+    // Evaluate confidence and risk
+    const confidence = await evaluateConfidence(
+      { contactInfo, context },
+      followUp
+    )
+
+    // Generate explanation
+    const explanation = await explainDecision(
+      {
+        userId,
+        actionType: 'schedule_followup',
+        input: { contactInfo, context },
+      },
+      followUp
+    )
+
+    // Check if approval is required
+    const approvalCheck = await shouldRequireApproval(
+      userId,
+      'schedule_followup',
+      confidence.confidenceScore,
+      confidence.riskLevel
+    )
+
+    // Log activity
+    const activityLog = await logActivity(
+      userId,
+      'schedule_followup',
+      'followup_agent',
+      approvalCheck.requiresApproval ? 'pending' : 'completed',
+      {
+        confidenceScore: confidence.confidenceScore,
+        riskLevel: confidence.riskLevel,
+        explanation,
+        inputData: { contactInfo, context },
+        outputData: followUp,
+      }
+    )
+
+    // If approval required, create approval request
+    if (approvalCheck.requiresApproval) {
+      await createApprovalRequest(
+        userId,
+        'schedule_followup',
+        followUp,
+        confidence,
+        explanation
+      )
+
+      // Save as pending (not scheduled yet)
+      return {
+        ...followUp,
+        requiresApproval: true,
+        approvalRequestId: activityLog?.id,
+        confidence,
+        explanation,
+      }
+    }
+
     // Save to database
-    await prisma.followUp.create({
+    const savedFollowUp = await prisma.followUp.create({
       data: {
         userId,
         leadName: followUp.leadName,
@@ -62,6 +127,10 @@ If no follow-up needed, return: {"needed": false}`
         scheduledFor: followUp.scheduledFor,
         channel: followUp.channel,
         status: 'pending',
+        metadata: {
+          confidenceScore: confidence.confidenceScore,
+          riskLevel: confidence.riskLevel,
+        },
       },
     })
 
@@ -72,7 +141,11 @@ If no follow-up needed, return: {"needed": false}`
       channel: followUp.channel,
     })
 
-    return followUp
+    return {
+      ...savedFollowUp,
+      confidence,
+      explanation,
+    }
   } catch (error) {
     console.error('Error scheduling follow-up:', error)
     return null

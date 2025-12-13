@@ -217,7 +217,7 @@ export default function PlannerPage() {
           <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
             <div className="text-6xl mb-4">📅</div>
             <p className="text-gray-500 mb-2 text-lg font-medium">No schedule generated</p>
-            <p className="text-sm text-gray-400 mb-6">Click "Generate Schedule" to create your weekly plan</p>
+            <p className="text-sm text-gray-400 mb-6">Click &quot;Generate Schedule&quot; to create your weekly plan</p>
             <button
               onClick={generateSchedule}
               disabled={loading}

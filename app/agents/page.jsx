@@ -134,7 +134,7 @@ export default function AgentsPage() {
             <div className="text-6xl mb-4">🤖</div>
             <p className="text-gray-500 mb-2 text-lg font-medium">No agents available</p>
             <p className="text-sm text-gray-400">
-              Agents will appear here once they're configured
+              Agents will appear here once they&apos;re configured
             </p>
           </div>
         ) : (

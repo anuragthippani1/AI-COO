@@ -283,7 +283,7 @@ export default function AutomationsPage() {
     },
   ]
 
-  const useTemplate = (template) => {
+  const applyTemplate = (template) => {
     setNewWorkflow({
       name: template.name,
       description: template.description,
@@ -516,7 +516,7 @@ export default function AutomationsPage() {
                       {workflowTemplates.map((template, idx) => (
                         <button
                           key={idx}
-                          onClick={() => useTemplate(template)}
+                          onClick={() => applyTemplate(template)}
                           className="w-full text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"
                         >
                           <div className="font-medium text-gray-900">{template.name}</div>

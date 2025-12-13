@@ -1,9 +1,15 @@
 import { getChatCompletion } from '@/lib/openai'
 import { getMemoryContext } from '@/lib/memory'
 import { generateProposalPDF } from '@/lib/proposal'
+import { evaluateConfidence } from './confidence_engine'
+import { shouldRequireApproval, createApprovalRequest } from '@/lib/approval_manager'
+import { logActivity } from '@/lib/activity_logger'
+import { explainDecision } from './explainability_engine'
 
 export async function generateProposal(userId, clientData, services, pricing) {
   try {
+    // TODO: Add simulation mode check
+    // TODO: Add rate limit check
     // Get business context from memory
     const businessContext = await getMemoryContext(userId, 'business services pricing', 1000)
     const writingStyle = await getMemoryContext(userId, 'proposal writing style tone', 500)
@@ -41,19 +47,81 @@ Return the proposal as formatted text ready for PDF conversion.`
       { role: 'user', content: prompt },
     ])
 
-    // Generate PDF
-    const pdfUrl = await generateProposalPDF({
+    const proposalData = {
       clientName: clientData.name,
       clientEmail: clientData.email,
       proposalText: proposalText || '',
       services,
       pricing,
       generatedAt: new Date(),
-    })
+    }
+
+    // Evaluate confidence and risk
+    const confidence = await evaluateConfidence(
+      { clientData, services, pricing },
+      proposalData
+    )
+
+    // Generate explanation
+    const explanation = await explainDecision(
+      {
+        userId,
+        actionType: 'generate_proposal',
+        input: { clientData, services, pricing },
+      },
+      proposalData
+    )
+
+    // Check if approval is required
+    const approvalCheck = await shouldRequireApproval(
+      userId,
+      'generate_proposal',
+      confidence.confidenceScore,
+      confidence.riskLevel
+    )
+
+    // Log activity
+    const activityLog = await logActivity(
+      userId,
+      'generate_proposal',
+      'proposal_agent',
+      approvalCheck.requiresApproval ? 'pending' : 'completed',
+      {
+        confidenceScore: confidence.confidenceScore,
+        riskLevel: confidence.riskLevel,
+        explanation,
+        inputData: { clientData, services, pricing },
+        outputData: proposalData,
+      }
+    )
+
+    // If approval required, create approval request
+    if (approvalCheck.requiresApproval) {
+      await createApprovalRequest(
+        userId,
+        'generate_proposal',
+        proposalData,
+        confidence,
+        explanation
+      )
+
+      return {
+        proposalText: proposalText || '',
+        requiresApproval: true,
+        approvalRequestId: activityLog?.id,
+        confidence,
+        explanation,
+      }
+    }
+
+    // Generate PDF
+    const pdfUrl = await generateProposalPDF(proposalData)
 
     return {
       proposalText: proposalText || '',
       pdfUrl,
+      confidence,
+      explanation,
     }
   } catch (error) {
     console.error('Error generating proposal:', error)

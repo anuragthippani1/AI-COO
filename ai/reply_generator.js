@@ -3,9 +3,15 @@ import { getMemoryContext } from '@/lib/memory'
 import { getWritingTone } from '@/lib/memory_enhanced'
 import { getUserStyleProfile } from '@/ai/user_style_learner'
 import { prisma } from '@/lib/prisma'
+import { evaluateConfidence } from './confidence_engine'
+import { shouldRequireApproval, createApprovalRequest } from '@/lib/approval_manager'
+import { logActivity } from '@/lib/activity_logger'
+import { explainDecision } from './explainability_engine'
 
 export async function generateReply(userId, emailContent, metadata = {}) {
   try {
+    // TODO: Add simulation mode check
+    // TODO: Add rate limit check
     // Get user's style profile (learned from past emails)
     const styleProfile = await getUserStyleProfile(userId)
     
@@ -47,6 +53,87 @@ Return only the email body, no subject line.`
       { role: 'user', content: prompt },
     ], 0.7)
 
+    // Evaluate confidence and risk
+    const confidence = await evaluateConfidence(
+      { emailContent, ...metadata },
+      reply
+    )
+
+    // Generate explanation
+    const explanation = await explainDecision(
+      {
+        userId,
+        actionType: 'send_email',
+        input: { emailContent, ...metadata },
+      },
+      { reply }
+    )
+
+    // Check if approval is required
+    const approvalCheck = await shouldRequireApproval(
+      userId,
+      'send_email',
+      confidence.confidenceScore,
+      confidence.riskLevel
+    )
+
+    // Log activity
+    const activityLog = await logActivity(
+      userId,
+      'generate_reply',
+      'reply_agent',
+      approvalCheck.requiresApproval ? 'pending' : 'completed',
+      {
+        confidenceScore: confidence.confidenceScore,
+        riskLevel: confidence.riskLevel,
+        explanation,
+        inputData: { emailContent, ...metadata },
+        outputData: { reply },
+      }
+    )
+
+    // If approval required, create approval request
+    if (approvalCheck.requiresApproval) {
+      await createApprovalRequest(
+        userId,
+        'send_email',
+        {
+          to: metadata.to || metadata.from,
+          subject: metadata.subject || 'Re: ' + (metadata.emailSubject || ''),
+          body: reply,
+        },
+        confidence,
+        explanation
+      )
+
+      // Save reply to email record as draft
+      if (metadata.messageId) {
+        await prisma.email.updateMany({
+          where: {
+            userId,
+            messageId: metadata.messageId,
+          },
+          data: {
+            aiReply: reply || '',
+            metadata: {
+              ...metadata,
+              requiresApproval: true,
+              confidenceScore: confidence.confidenceScore,
+              riskLevel: confidence.riskLevel,
+            },
+          },
+        })
+      }
+
+      return {
+        reply: reply || '',
+        requiresApproval: true,
+        approvalRequestId: activityLog?.id,
+        confidence,
+        explanation,
+      }
+    }
+
     // Save reply to email record if messageId exists
     if (metadata.messageId) {
       await prisma.email.updateMany({
@@ -56,11 +143,20 @@ Return only the email body, no subject line.`
         },
         data: {
           aiReply: reply || '',
+          metadata: {
+            ...metadata,
+            confidenceScore: confidence.confidenceScore,
+            riskLevel: confidence.riskLevel,
+          },
         },
       })
     }
 
-    return reply || ''
+    return {
+      reply: reply || '',
+      confidence,
+      explanation,
+    }
   } catch (error) {
     console.error('Error generating reply:', error)
     return 'I apologize, but I encountered an error generating a reply. Please try again.'

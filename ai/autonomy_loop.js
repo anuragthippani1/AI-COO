@@ -3,6 +3,12 @@ import { runPipeline } from './agent_orchestrator'
 import { searchDeepMemory, saveDeepMemory } from '@/lib/memory_deep'
 import { analyzeEmailThread } from './email_thread_analyzer'
 import { computePriority } from './priority_engine'
+import { shouldPauseAutonomy, recordFailure, recordRejection, requiresApprovalForConfidence } from './safety_guard'
+import { evaluateConfidence } from './confidence_engine'
+import { shouldRequireApproval } from '@/lib/approval_manager'
+import { logActivity } from '@/lib/activity_logger'
+import { isFeatureEnabled } from '@/lib/feature_flags'
+import { checkRateLimit } from '@/lib/cost_guard'
 
 /**
  * Agent Autonomy Loop
@@ -24,6 +30,24 @@ export async function runAutonomyLoop(userId, config = {}) {
 
     if (!enabled) {
       return { success: false, reason: 'Autonomy loop disabled' }
+    }
+
+    // Check if autonomy feature is enabled
+    const autonomyEnabled = await isFeatureEnabled(userId, 'autonomy_mode')
+    if (!autonomyEnabled) {
+      return { success: false, reason: 'Autonomy mode not enabled for this plan' }
+    }
+
+    // Check safety guard
+    const safetyCheck = await shouldPauseAutonomy(userId, 'autonomy_loop')
+    if (safetyCheck.shouldPause) {
+      return { success: false, reason: safetyCheck.reason }
+    }
+
+    // Check rate limit
+    const rateLimitCheck = await checkRateLimit(userId, 'autonomy_loop', 1000)
+    if (!rateLimitCheck.allowed) {
+      return { success: false, reason: rateLimitCheck.reason }
     }
 
     console.log(`[Autonomy Loop] Starting for user ${userId}`)
@@ -276,6 +300,65 @@ async function execute(userId, decisions) {
 
   for (const decision of decisions) {
     try {
+      // Evaluate confidence for this decision
+      const confidence = await evaluateConfidence(
+        { decision, metadata: decision.metadata },
+        decision
+      )
+
+      // Check if approval required based on confidence
+      if (requiresApprovalForConfidence(confidence.confidenceScore)) {
+        // Skip execution, require approval
+        results.push({
+          decision,
+          result: {
+            success: false,
+            requiresApproval: true,
+            reason: `Low confidence (${confidence.confidenceScore}%). Approval required.`,
+          },
+          confidence,
+          success: false,
+          timestamp: new Date().toISOString(),
+        })
+        continue
+      }
+
+      // Check approval for specific action types
+      const approvalCheck = await shouldRequireApproval(
+        userId,
+        decision.action,
+        confidence.confidenceScore,
+        confidence.riskLevel
+      )
+
+      if (approvalCheck.requiresApproval) {
+        // Log as pending approval
+        await logActivity(
+          userId,
+          decision.action,
+          'autonomy_loop',
+          'pending',
+          {
+            confidenceScore: confidence.confidenceScore,
+            riskLevel: confidence.riskLevel,
+            inputData: decision,
+          }
+        )
+
+        results.push({
+          decision,
+          result: {
+            success: false,
+            requiresApproval: true,
+            reason: approvalCheck.reason,
+          },
+          confidence,
+          success: false,
+          timestamp: new Date().toISOString(),
+        })
+        continue
+      }
+
       let result
 
       if (decision.action === 'process_email') {
@@ -311,14 +394,50 @@ async function execute(userId, decisions) {
         })
       }
 
+      // Log activity
+      await logActivity(
+        userId,
+        decision.action,
+        'autonomy_loop',
+        result?.success !== false ? 'completed' : 'failed',
+        {
+          confidenceScore: confidence.confidenceScore,
+          riskLevel: confidence.riskLevel,
+          inputData: decision,
+          outputData: result,
+        }
+      )
+
+      // Record failure if needed
+      if (result?.success === false) {
+        await recordFailure(userId, decision.action, result.error || 'Action failed')
+      }
+
       results.push({
         decision,
         result,
+        confidence,
         success: result?.success !== false,
         timestamp: new Date().toISOString(),
       })
     } catch (error) {
       console.error(`Error executing decision ${decision.action}:`, error)
+      
+      // Record failure
+      await recordFailure(userId, decision.action, error.message)
+      
+      // Log activity
+      await logActivity(
+        userId,
+        decision.action,
+        'autonomy_loop',
+        'failed',
+        {
+          inputData: decision,
+          outputData: { error: error.message },
+        }
+      )
+
       results.push({
         decision,
         result: { success: false, error: error.message },

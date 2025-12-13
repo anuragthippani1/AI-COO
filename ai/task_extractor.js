@@ -1,9 +1,13 @@
 import { getChatCompletion } from '@/lib/openai'
 import { prisma } from '@/lib/prisma'
 import { saveMemory } from '@/lib/memory'
+import { evaluateConfidence } from './confidence_engine'
+import { logActivity } from '@/lib/activity_logger'
 
 export async function extractTasksFromEmail(userId, emailContent, metadata = {}) {
   try {
+    // TODO: Add simulation mode check
+    // TODO: Add rate limit check
     const prompt = `Extract actionable tasks from this email. Return ONLY a valid JSON array of tasks, no other text.
 
 Email content:
@@ -43,6 +47,12 @@ Return format:
 
     const tasks = JSON.parse(jsonMatch[0])
 
+    // Evaluate confidence for task extraction
+    const confidence = await evaluateConfidence(
+      { emailContent, ...metadata },
+      { tasks }
+    )
+
     // Use priority from metadata if provided (from priority engine)
     const basePriority = metadata.priority || 'MEDIUM'
 
@@ -66,6 +76,8 @@ Return format:
           metadata: {
             assignee: task.assignee,
             threadInsights: metadata.threadInsights,
+            confidenceScore: confidence.confidenceScore,
+            riskLevel: confidence.riskLevel,
             ...metadata,
           },
         },
@@ -80,7 +92,25 @@ Return format:
       })
     }
 
-    return tasks
+    // Log activity
+    await logActivity(
+      userId,
+      'extract_tasks',
+      'task_agent',
+      'completed',
+      {
+        confidenceScore: confidence.confidenceScore,
+        riskLevel: confidence.riskLevel,
+        inputData: { emailContent, ...metadata },
+        outputData: { tasks: createdTasks },
+      }
+    )
+
+    return {
+      tasks,
+      confidence,
+      createdTasks,
+    }
   } catch (error) {
     console.error('Error extracting tasks:', error)
     return []

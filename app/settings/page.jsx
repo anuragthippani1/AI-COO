@@ -293,41 +293,42 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-bold mb-6">Settings</h1>
+      <div className="p-6 md:p-8 space-y-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-1">Manage your account and preferences</p>
+        </div>
 
         {/* Error Message */}
         {errorMessage && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex justify-between items-start">
-              <div className="text-red-800 whitespace-pre-line">{errorMessage}</div>
-              <button
-                onClick={() => setErrorMessage('')}
-                className="text-red-600 hover:text-red-800 ml-4"
-              >
-                ×
-              </button>
-            </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-start">
+            <div className="text-red-800 whitespace-pre-line text-sm">{errorMessage}</div>
+            <button
+              onClick={() => setErrorMessage('')}
+              className="text-red-600 hover:text-red-800 ml-4"
+            >
+              ×
+            </button>
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 text-sm">
             {successMessage}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
+                    ? 'border-gray-900 text-gray-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -338,7 +339,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Profile Settings</h2>
@@ -373,7 +374,7 @@ export default function SettingsPage() {
                   <button
                     onClick={saveProfile}
                     disabled={saving}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                    className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -398,7 +399,7 @@ export default function SettingsPage() {
               </div>
               
               {/* Gmail Integration */}
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -518,7 +519,7 @@ export default function SettingsPage() {
                             setErrorMessage(`Failed to connect Gmail: ${error.message}`)
                           }
                         }}
-                        className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
+                        className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         Connect
                       </button>
@@ -528,7 +529,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Calendar Integration */}
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -586,7 +587,7 @@ export default function SettingsPage() {
                           }
                         }}
                         disabled={!integrations.gmail?.connected}
-                        className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Connect
                       </button>
@@ -596,7 +597,7 @@ export default function SettingsPage() {
               </div>
 
               {/* WhatsApp Integration */}
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -666,7 +667,7 @@ export default function SettingsPage() {
                 <div className="text-center py-8">Loading billing information...</div>
               ) : (
                 <>
-                  <div className="border rounded-lg p-4">
+                  <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <div className="flex justify-between items-center mb-4">
                       <div>
                         <h3 className="font-medium">Current Plan</h3>
@@ -681,7 +682,7 @@ export default function SettingsPage() {
                         {billing.canUpgrade && (
                           <button
                             onClick={() => handleUpgrade('pro')}
-                            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
+                            className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                           >
                             Upgrade
                           </button>
@@ -773,7 +774,7 @@ export default function SettingsPage() {
                   <button
                     onClick={saveNotifications}
                     disabled={saving}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                    className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? 'Saving...' : 'Save Preferences'}
                   </button>

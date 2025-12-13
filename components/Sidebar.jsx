@@ -7,6 +7,7 @@ const menuItems = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
   { name: 'Inbox', href: '/inbox', icon: '📧' },
   { name: 'Tasks', href: '/tasks', icon: '✅' },
+  { name: 'WhatsApp', href: '/whatsapp', icon: '💬' },
   { name: 'CRM / Leads', href: '/crm', icon: '👥' },
   { name: 'Invoices', href: '/invoices', icon: '📄' },
   { name: 'Proposals', href: '/proposals', icon: '📋' },

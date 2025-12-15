@@ -187,3 +187,4 @@ Once connected, you should see:
 
 The integration is now ready to use for email automation!
 
+

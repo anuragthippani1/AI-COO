@@ -7,11 +7,17 @@ import Link from 'next/link'
 export default function Dashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [usage, setUsage] = useState(null)
+  const [usageLoading, setUsageLoading] = useState(true)
 
   useEffect(() => {
     fetchDashboardData()
+    fetchUsageStats()
     // Refresh every 30 seconds
-    const interval = setInterval(fetchDashboardData, 30000)
+    const interval = setInterval(() => {
+      fetchDashboardData()
+      fetchUsageStats()
+    }, 30000)
     return () => clearInterval(interval)
   }, [])
 
@@ -32,6 +38,26 @@ export default function Dashboard() {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchUsageStats = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/usage/stats', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const usageData = await response.json()
+        setUsage(usageData.usage)
+      }
+    } catch (error) {
+      console.error('Error fetching usage stats:', error)
+    } finally {
+      setUsageLoading(false)
     }
   }
 
@@ -169,6 +195,85 @@ export default function Dashboard() {
           <div className="text-xs text-gray-500">
             {data.stats?.invoices?.total || 0} invoices
           </div>
+        </div>
+      </div>
+
+      {/* Usage Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 lg:col-span-1">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="text-gray-900 font-semibold text-sm flex items-center gap-2">
+                <span>📊</span> AI Usage This Cycle
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Monitor tokens and actions to stay within your plan limits.
+              </p>
+            </div>
+          </div>
+          {usageLoading ? (
+            <div className="animate-pulse space-y-3 mt-2">
+              <div className="h-3 bg-gray-100 rounded-full" />
+              <div className="h-3 bg-gray-100 rounded-full" />
+              <div className="h-3 bg-gray-100 rounded-full" />
+            </div>
+          ) : !usage ? (
+            <p className="text-xs text-gray-500 mt-2">Usage data not available right now.</p>
+          ) : (
+            <div className="space-y-3 mt-2">
+              <div>
+                <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
+                  <span>Daily tokens</span>
+                  <span>
+                    {usage.daily.tokensUsed.toLocaleString()} /{' '}
+                    {usage.daily.limitTokens.toLocaleString()}
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-2 bg-gray-900 rounded-full transition-all"
+                    style={{
+                      width: `${
+                        usage.daily.limitTokens
+                          ? Math.min(
+                              100,
+                              (usage.daily.tokensUsed / usage.daily.limitTokens) * 100
+                            )
+                          : 0
+                      }%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
+                  <span>Daily actions</span>
+                  <span>
+                    {usage.daily.actionsCount.toLocaleString()} /{' '}
+                    {usage.daily.limitActions.toLocaleString()}
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-2 bg-gray-900 rounded-full transition-all"
+                    style={{
+                      width: `${
+                        usage.daily.limitActions
+                          ? Math.min(
+                              100,
+                              (usage.daily.actionsCount / usage.daily.limitActions) * 100
+                            )
+                          : 0
+                      }%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Plan: <span className="font-medium text-gray-800">{usage.tier}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

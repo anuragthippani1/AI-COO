@@ -175,3 +175,4 @@ function checkKeywordRisk(input) {
   return Math.min(100, riskScore)
 }
 
+

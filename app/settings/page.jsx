@@ -8,6 +8,10 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [aiSettings, setAiSettings] = useState({
+    simulationMode: false,
+  })
+  const [loadingAiSettings, setLoadingAiSettings] = useState(false)
 
   useEffect(() => {
     // Check for OAuth callback errors/success
@@ -156,6 +160,35 @@ export default function SettingsPage() {
     }
   }
 
+  const fetchAiSettings = async () => {
+    setLoadingAiSettings(true)
+    try {
+      const token = localStorage.getItem('token')
+      // TODO: Replace this with a dedicated /api/settings/ai or feature-flags endpoint.
+      const response = await fetch('/api/usage/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (response.ok) {
+        // For now, derive a default from tier: PRO/AI_COO users get simulation enabled by default.
+        const data = await response.json()
+        const tier = data.usage?.tier || 'FREE'
+        setAiSettings({
+          simulationMode: tier === 'PRO' || tier === 'AI_COO',
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching AI settings:', error)
+    } finally {
+      setLoadingAiSettings(false)
+    }
+  }
+
+  useEffect(() => {
+    // Load AI settings after mount
+    fetchAiSettings()
+  }, [])
+
   const saveProfile = async () => {
     setSaving(true)
     try {
@@ -289,6 +322,7 @@ export default function SettingsPage() {
     { id: 'integrations', name: 'Integrations' },
     { id: 'billing', name: 'Billing' },
     { id: 'notifications', name: 'Notifications' },
+    { id: 'ai', name: 'AI Controls' },
   ]
 
   return (
@@ -778,6 +812,63 @@ export default function SettingsPage() {
                   >
                     {saving ? 'Saving...' : 'Save Preferences'}
                   </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'ai' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">AI Controls</h2>
+              {loadingAiSettings ? (
+                <div className="text-center py-8 text-sm text-gray-500">Loading AI settings...</div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="font-medium text-gray-900 text-sm">
+                            Simulation mode (dry-run only)
+                          </h3>
+                          <p className="text-xs text-gray-600 mt-1">
+                            When enabled, AI agents will run full reasoning but{' '}
+                            <span className="font-semibold">should not execute real actions</span> like
+                            sending emails or creating tasks. They will return reports instead.
+                          </p>
+                          <p className="text-[11px] text-gray-500 mt-2">
+                            TODO: Wire this toggle to a feature flag using{' '}
+                            <span className="font-mono">lib/feature_flags.js</span> and ensure all
+                            agents check it before executing real actions.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAiSettings((prev) => ({
+                              ...prev,
+                              simulationMode: !prev.simulationMode,
+                            }))
+                          }
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            aiSettings.simulationMode ? 'bg-gray-900' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              aiSettings.simulationMode ? 'translate-x-5' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-dashed border-gray-200 p-3 bg-white">
+                    <p className="text-[11px] text-gray-500">
+                      This page only controls the UI state for now. Persisting these settings to the
+                      database and enforcing them in all AI routes is left as a backend TODO.
+                    </p>
+                  </div>
                 </>
               )}
             </div>

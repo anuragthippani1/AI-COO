@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import AIPreviewModal from '@/components/AIPreviewModal'
 import { format } from 'date-fns'
 
 export default function AutomationsPage() {
@@ -19,6 +20,9 @@ export default function AutomationsPage() {
   const [showTemplates, setShowTemplates] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [previewData, setPreviewData] = useState(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
 
   useEffect(() => {
     fetchWorkflows()
@@ -219,6 +223,59 @@ export default function AutomationsPage() {
     } catch (error) {
       console.error('Error testing workflow:', error)
       setError('Failed to test automation: ' + error.message)
+    }
+  }
+
+  const handlePreview = async (workflow) => {
+    try {
+      setPreviewLoading(true)
+      setPreviewData(null)
+      setPreviewModalOpen(true)
+
+      const token = localStorage.getItem('token')
+      // This sends a minimal payload just to demonstrate preview wiring.
+      // TODO: Send full context, confidence, and real action payload for this automation.
+      const response = await fetch('/api/ai/preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          actionType: 'workflow_execute',
+          actionPayload: {
+            workflowId: workflow.id,
+            name: workflow.name,
+            trigger: workflow.trigger,
+            actions: workflow.actions,
+          },
+          context: {
+            source: 'automations_page',
+            // TODO: add richer context (recent activity, lead/task/email info)
+          },
+          confidence: 80,
+          risk: 'medium',
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to generate preview')
+      }
+
+      const data = await response.json()
+      setPreviewData(data.preview || null)
+    } catch (err) {
+      console.error('Error generating preview:', err)
+      setPreviewData({
+        previewText: 'Failed to generate preview.',
+        explanation: err.message || 'Unknown error while generating preview.',
+        confidence: 0,
+        risk: 'high',
+        actionType: 'workflow_execute',
+      })
+    } finally {
+      setPreviewLoading(false)
     }
   }
 
@@ -434,6 +491,13 @@ export default function AutomationsPage() {
                     title="Test this automation"
                   >
                     Test
+                  </button>
+                  <button
+                    onClick={() => handlePreview(workflow)}
+                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    title="Preview AI action before running"
+                  >
+                    Preview
                   </button>
                   <button
                     onClick={() => handleToggle(workflow)}
@@ -811,6 +875,27 @@ export default function AutomationsPage() {
             </div>
           </div>
         )}
+        <AIPreviewModal
+          isOpen={previewModalOpen}
+          onClose={() => setPreviewModalOpen(false)}
+          preview={
+            previewData || {
+              previewText: previewLoading ? 'Generating preview…' : '',
+              explanation: '',
+              confidence: 0,
+              risk: 'medium',
+              actionType: 'workflow_execute',
+            }
+          }
+          onApprove={() => {
+            // TODO: Call /api/ai/approve with real approvalRequestId and payload for this workflow.
+            setPreviewModalOpen(false)
+          }}
+          onReject={() => {
+            // TODO: Call /api/ai/reject with a reason and approvalRequestId.
+            setPreviewModalOpen(false)
+          }}
+        />
       </div>
     </DashboardLayout>
   )

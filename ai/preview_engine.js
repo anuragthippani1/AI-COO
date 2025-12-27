@@ -119,3 +119,4 @@ function getConfidenceLevel(score) {
 
 
 
+

@@ -68,29 +68,36 @@ export async function GET(request) {
         }
       )
 
-      // Process with AI agent
-      const agentResponse = await runAgent({
-        userId,
-        type: 'email',
-        content: `Subject: ${email.subject}\n\n${email.body}`,
-        metadata: {
-          messageId: email.messageId,
-          from: email.from,
-          to: email.to,
-          subject: email.subject,
-          autoResponseMatched: autoResponse.matched,
-        },
-      })
+      // Process with autonomous inbox automation
+      // This automatically classifies, extracts tasks, generates replies, and schedules follow-ups
+      const { processInboxEmail } = await import('@/ai/inbox_automation')
+      const automationResult = await processInboxEmail(userId, savedEmail)
 
-      // Update email with AI processing results
-      await prisma.email.update({
-        where: { id: savedEmail.id },
-        data: {
-          isProcessed: true,
-          extractedTasks: agentResponse.data?.tasks || [],
-          aiReply: agentResponse.data?.reply || null,
-        },
-      })
+      // If automation didn't process (already processed or error), fall back to basic agent
+      if (!automationResult.success || automationResult.alreadyProcessed) {
+        const agentResponse = await runAgent({
+          userId,
+          type: 'email',
+          content: `Subject: ${email.subject}\n\n${email.body}`,
+          metadata: {
+            messageId: email.messageId,
+            from: email.from,
+            to: email.to,
+            subject: email.subject,
+            autoResponseMatched: autoResponse.matched,
+          },
+        })
+
+        // Update email with AI processing results
+        await prisma.email.update({
+          where: { id: savedEmail.id },
+          data: {
+            isProcessed: true,
+            extractedTasks: agentResponse.data?.tasks || [],
+            aiReply: agentResponse.data?.reply || null,
+          },
+        })
+      }
 
       // Trigger workflows for email_received
       await processWorkflowTrigger(userId, 'email_received', {

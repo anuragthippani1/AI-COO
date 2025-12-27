@@ -24,6 +24,12 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token')
+      if (!token) {
+        console.error('No token found')
+        setLoading(false)
+        return
+      }
+
       const response = await fetch('/api/dashboard/stats', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -33,6 +39,14 @@ export default function Dashboard() {
       if (response.ok) {
         const dashboardData = await response.json()
         setData(dashboardData)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Error fetching dashboard data:', errorData.error || 'Unknown error')
+        if (response.status === 401) {
+          // Token expired or invalid - redirect to login
+          localStorage.removeItem('token')
+          window.location.href = '/login'
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -104,11 +118,20 @@ export default function Dashboard() {
     )
   }
 
-  if (!data) {
+  if (!data && !loading) {
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <p className="text-red-800">Error loading dashboard. Please refresh the page.</p>
+          <p className="text-red-800 mb-4">Error loading dashboard. Please try again.</p>
+          <button
+            onClick={() => {
+              setLoading(true)
+              fetchDashboardData()
+            }}
+            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     )

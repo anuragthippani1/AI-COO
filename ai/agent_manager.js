@@ -6,9 +6,14 @@ import { generateReply } from './reply_generator'
 import { scheduleFollowUp } from './followup_scheduler'
 import { analyzeEmailThread } from './email_thread_analyzer'
 import { computePriority } from './priority_engine'
+import { evaluateConfidence } from './confidence_engine'
+import { shouldRequireApproval, createApprovalRequest } from '@/lib/approval_manager'
+import { logActivity } from '@/lib/activity_logger'
+import { explainDecision } from './explainability_engine'
 
 /**
  * Main agent runner - processes input and determines actions
+ * CENTRALIZED DECISION HUB: All AI actions flow through here for confidence-based execution
  */
 export async function runAgent(input) {
   try {
@@ -73,6 +78,122 @@ What should I do?`
   }
 }
 
+/**
+ * Centralized decision maker for AI actions
+ * Determines: auto-execute, request approval, or escalate
+ * @param {string} userId - User ID
+ * @param {string} actionType - Type of action (create_task, send_email, etc.)
+ * @param {object} actionData - Data for the action
+ * @param {object} context - Additional context (email, task, etc.)
+ * @returns {Promise<{decision: string, executed?: boolean, approvalRequestId?: string, explanation?: string}>}
+ */
+export async function makeDecision(userId, actionType, actionData, context = {}) {
+  try {
+    // Evaluate confidence and risk
+    const confidenceResult = await evaluateConfidence(context, actionData)
+    const { confidenceScore, riskLevel } = confidenceResult
+
+    // Check if approval is required
+    const approvalCheck = await shouldRequireApproval(
+      userId,
+      actionType,
+      confidenceScore,
+      riskLevel
+    )
+
+    // Generate explanation for the action
+    const explanation = await explainDecision(actionType, {
+      ...context,
+      actionData,
+      confidenceScore,
+      riskLevel,
+    })
+
+    // Decision logic: auto-execute if high confidence and low risk
+    if (!approvalCheck.requiresApproval && confidenceScore >= 80 && riskLevel === 'low') {
+      // Auto-execute
+      await logActivity(userId, actionType, 'agent_manager', 'completed', {
+        confidenceScore,
+        riskLevel,
+        inputData: context,
+        outputData: actionData,
+        explanation: `${explanation} (Auto-executed)`,
+      })
+
+      return {
+        decision: 'auto_execute',
+        executed: true,
+        confidenceScore,
+        riskLevel,
+        explanation,
+      }
+    } else if (confidenceScore >= 70 && riskLevel !== 'high') {
+      // Request approval but suggest auto-execution
+      const approvalRequest = await createApprovalRequest(
+        userId,
+        actionType,
+        actionData,
+        { confidenceScore, riskLevel },
+        explanation
+      )
+
+      await logActivity(userId, actionType, 'agent_manager', 'pending_approval', {
+        confidenceScore,
+        riskLevel,
+        inputData: context,
+        outputData: actionData,
+        explanation: `${explanation} (Pending approval)`,
+      })
+
+      return {
+        decision: 'request_approval',
+        executed: false,
+        approvalRequestId: approvalRequest.approvalRequestId,
+        confidenceScore,
+        riskLevel,
+        explanation,
+      }
+    } else {
+      // Low confidence or high risk - require approval
+      const approvalRequest = await createApprovalRequest(
+        userId,
+        actionType,
+        actionData,
+        { confidenceScore, riskLevel },
+        explanation
+      )
+
+      await logActivity(userId, actionType, 'agent_manager', 'requires_approval', {
+        confidenceScore,
+        riskLevel,
+        inputData: context,
+        outputData: actionData,
+        explanation: `${explanation} (Requires approval - low confidence or high risk)`,
+      })
+
+      return {
+        decision: 'require_approval',
+        executed: false,
+        approvalRequestId: approvalRequest.approvalRequestId,
+        confidenceScore,
+        riskLevel,
+        explanation,
+      }
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error making decision:', error)
+    // On error, require approval for safety
+    return {
+      decision: 'require_approval',
+      executed: false,
+      confidenceScore: 0,
+      riskLevel: 'high',
+      explanation: 'Error evaluating action - approval required',
+      error: error.message,
+    }
+  }
+}
+
 async function handleEmail(input) {
   const emailContent = input.content
   const emailMetadata = input.metadata || {}
@@ -126,6 +247,10 @@ async function handleEmail(input) {
       }
     )
   }
+
+  // TODO: Use centralized makeDecision() for each action (create_task, send_email, schedule_followup)
+  // For now, returning suggestions - inbox_automation.js handles the actual execution with confidence-based logic
+  // Future: Refactor inbox_automation to use agent_manager.makeDecision() for consistency
 
   return {
     success: true,

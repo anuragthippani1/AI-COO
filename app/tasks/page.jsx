@@ -173,13 +173,19 @@ export default function TasksPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Tasks</h1>
             <p className="text-gray-600 mt-1">
               {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} {filter !== 'all' ? `(${filter})` : ''}
+              {filteredTasks.filter(t => t.source === 'email' || t.source === 'ai_generated').length > 0 && (
+                <span className="ml-2 text-sm text-indigo-600">
+                  • {filteredTasks.filter(t => t.source === 'email' || t.source === 'ai_generated').length} AI-created
+                </span>
+              )}
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 text-sm"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2 text-sm"
+            title="Most tasks are created automatically from emails"
           >
-            <span>+</span> New Task
+            <span>+</span> Manual Task
           </button>
         </div>
 
@@ -329,6 +335,11 @@ export default function TasksPage() {
                         <p className="text-sm text-gray-600 mb-3 ml-8">{task.description}</p>
                       )}
                       <div className="flex items-center gap-3 flex-wrap ml-8">
+                        {(task.source === 'email' || task.source === 'ai_generated') && (
+                          <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium border border-indigo-200">
+                            🤖 AI Created
+                          </span>
+                        )}
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium border border-gray-200">
                           {task.priority}
                         </span>

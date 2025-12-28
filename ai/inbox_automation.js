@@ -1,6 +1,9 @@
 /**
  * Autonomous Inbox Automation
  * Automatically processes emails and takes actions based on confidence
+ * 
+ * TODO: Future refactor - Use agent_manager.makeDecision() for centralized decision-making
+ * This will ensure all AI actions go through the same confidence-based execution logic
  */
 
 import { classifyEmail } from './email_classifier'

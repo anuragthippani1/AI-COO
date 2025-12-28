@@ -116,7 +116,14 @@ export default function CRMPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">CRM / Leads</h1>
-            <p className="text-gray-600 mt-1">Manage your sales pipeline</p>
+            <p className="text-gray-600 mt-1">
+              Manage your sales pipeline
+              {leads.filter(l => l.source === 'email' || l.source === 'ai_detected').length > 0 && (
+                <span className="ml-2 text-sm text-indigo-600">
+                  • {leads.filter(l => l.source === 'email' || l.source === 'ai_detected').length} AI-detected
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex gap-2">
             <button
@@ -127,9 +134,10 @@ export default function CRMPage() {
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 text-sm"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2 text-sm"
+              title="Most leads are detected automatically from emails"
             >
-              <span>+</span> Add Lead
+              <span>+</span> Manual Lead
             </button>
           </div>
         </div>
@@ -370,6 +378,7 @@ export default function CRMPage() {
     </DashboardLayout>
   )
 }
+
 
 
 

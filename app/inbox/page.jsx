@@ -135,23 +135,29 @@ export default function InboxPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Inbox</h1>
             <p className="text-gray-600 mt-1">
               {emails.length} email{emails.length !== 1 ? 's' : ''} total
+              {emails.filter(e => e.isProcessed).length > 0 && (
+                <span className="ml-2 text-sm text-indigo-600">
+                  • {emails.filter(e => e.isProcessed).length} processed by AI
+                </span>
+              )}
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => fetchEmails(true)}
               disabled={fetching || loading}
-              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 text-sm"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 text-sm"
+              title="Emails are automatically processed when fetched"
             >
               {fetching ? (
                 <>
                   <span className="animate-spin">🔄</span>
-                  <span>Fetching...</span>
+                  <span>Processing...</span>
                 </>
               ) : (
                 <>
                   <span>📧</span>
-                  <span>Fetch from Gmail</span>
+                  <span>Fetch & Process</span>
                 </>
               )}
             </button>

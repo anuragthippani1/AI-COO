@@ -25,13 +25,20 @@ export async function POST(request) {
       )
     }
 
-    // TODO: Execute the approved action
-    // This would call the appropriate agent/function with actionData
+    // Action is already executed by approveAction
+    // Emit event for agent loop to handle post-approval actions
+    const { eventSystem, EVENTS } = await import('@/lib/event_system')
+    await eventSystem.emit(EVENTS.USER_APPROVAL_RECEIVED, userId, {
+      approvalRequestId,
+      actionData: result.actionData,
+      result: result.result,
+    })
 
     return NextResponse.json({
       success: true,
       approved: true,
       actionData: result.actionData,
+      result: result.result,
     })
   } catch (error) {
     console.error('Approve action error:', error)

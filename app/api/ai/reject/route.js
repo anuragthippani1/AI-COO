@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import { rejectAction } from '@/lib/approval_manager'
-import { recordRejection } from '@/ai/safety_guard'
 
 export async function POST(request) {
   try {
@@ -26,9 +25,8 @@ export async function POST(request) {
       )
     }
 
-    // Record rejection for safety guard
-    // TODO: Extract actionType from approval request
-    await recordRejection(userId, 'unknown', reason || 'User rejected')
+    // Rejection is already recorded by rejectAction
+    // Event is already emitted by rejectAction
 
     return NextResponse.json({
       success: true,

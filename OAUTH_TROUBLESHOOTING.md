@@ -211,3 +211,10 @@ After completing all steps:
 If you still see errors, check the error message in the Settings page - it will tell you exactly what's wrong.
 
 
+
+
+
+
+
+
+

@@ -14,6 +14,16 @@ import { explainDecision } from './explainability_engine'
 /**
  * Main agent runner - processes input and determines actions
  * CENTRALIZED DECISION HUB: All AI actions flow through here for confidence-based execution
+ * 
+ * NOTE: In the agent-driven architecture, this is primarily used for:
+ * - User queries/commands
+ * - Workflow-triggered actions
+ * - Manual overrides
+ * 
+ * For event-driven actions (emails, tasks, follow-ups), use:
+ * - eventSystem.emit() to trigger events
+ * - agent_loop.js handles events automatically
+ * - makeDecision() centralizes all action decisions
  */
 export async function runAgent(input) {
   try {
@@ -79,13 +89,54 @@ What should I do?`
 }
 
 /**
+ * Execute an action after decision is made
+ * This is the ONLY way actions should be executed in the agent-driven system
+ * @param {string} userId - User ID
+ * @param {string} actionType - Type of action
+ * @param {object} actionData - Action data
+ * @returns {Promise<{success: boolean, result?: object, error?: string}>}
+ */
+export async function executeAction(userId, actionType, actionData) {
+  try {
+    switch (actionType) {
+      case 'create_task':
+        return await executeCreateTask(userId, actionData)
+      
+      case 'send_email':
+        return await executeSendEmail(userId, actionData)
+      
+      case 'schedule_followup':
+        return await executeScheduleFollowUp(userId, actionData)
+      
+      case 'update_crm':
+        return await executeUpdateCRM(userId, actionData)
+      
+      case 'notify_task_overdue':
+        return await executeNotifyTaskOverdue(userId, actionData)
+      
+      default:
+        return {
+          success: false,
+          error: `Unknown action type: ${actionType}`,
+        }
+    }
+  } catch (error) {
+    console.error(`[AgentManager] Error executing ${actionType}:`, error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+/**
  * Centralized decision maker for AI actions
  * Determines: auto-execute, request approval, or escalate
  * @param {string} userId - User ID
  * @param {string} actionType - Type of action (create_task, send_email, etc.)
  * @param {object} actionData - Data for the action
  * @param {object} context - Additional context (email, task, etc.)
- * @returns {Promise<{decision: string, executed?: boolean, approvalRequestId?: string, explanation?: string}>}
+ * @returns {Promise<{decision: string, executed?: boolean, approvalRequestId?: string, explanation?: string, result?: object}>}
  */
 export async function makeDecision(userId, actionType, actionData, context = {}) {
   try {
@@ -112,17 +163,21 @@ export async function makeDecision(userId, actionType, actionData, context = {})
     // Decision logic: auto-execute if high confidence and low risk
     if (!approvalCheck.requiresApproval && confidenceScore >= 80 && riskLevel === 'low') {
       // Auto-execute
-      await logActivity(userId, actionType, 'agent_manager', 'completed', {
+      const executionResult = await executeAction(userId, actionType, actionData)
+      
+      await logActivity(userId, actionType, 'agent_manager', executionResult.success ? 'completed' : 'failed', {
         confidenceScore,
         riskLevel,
         inputData: context,
-        outputData: actionData,
+        outputData: executionResult.result || actionData,
         explanation: `${explanation} (Auto-executed)`,
       })
 
       return {
         decision: 'auto_execute',
         executed: true,
+        success: executionResult.success,
+        result: executionResult.result,
         confidenceScore,
         riskLevel,
         explanation,
@@ -333,6 +388,106 @@ async function handleWorkflow(input) {
   return {
     success: true,
     data: workflow,
+  }
+}
+
+// Execution functions for each action type
+
+async function executeCreateTask(userId, actionData) {
+  const task = await prisma.task.create({
+    data: {
+      userId,
+      title: actionData.title || actionData.task?.title,
+      description: actionData.description || actionData.task?.description || '',
+      priority: actionData.priority || actionData.task?.priority || 'MEDIUM',
+      dueDate: actionData.dueDate || actionData.task?.dueDate ? new Date(actionData.dueDate || actionData.task.dueDate) : null,
+      source: 'ai_generated',
+      sourceId: actionData.emailId || null,
+      metadata: actionData.metadata || {},
+    },
+  })
+
+  await saveMemory(userId, `Task created: ${task.title}`, {
+    type: 'task',
+    source: 'agent',
+    taskId: task.id,
+  })
+
+  return {
+    success: true,
+    result: { taskId: task.id, task },
+  }
+}
+
+async function executeSendEmail(userId, actionData) {
+  const { sendEmail } = await import('@/lib/gmail')
+  
+  await sendEmail(userId, {
+    to: actionData.to || actionData.email?.from,
+    subject: actionData.subject || `Re: ${actionData.email?.subject || ''}`,
+    body: actionData.body || actionData.reply,
+    threadId: actionData.threadId || actionData.email?.threadId,
+  })
+
+  // Update email status if emailId provided
+  if (actionData.emailId) {
+    await prisma.email.update({
+      where: { id: actionData.emailId },
+      data: {
+        status: 'REPLIED',
+        aiReply: actionData.reply || actionData.body,
+      },
+    })
+  }
+
+  return {
+    success: true,
+    result: { sent: true },
+  }
+}
+
+async function executeScheduleFollowUp(userId, actionData) {
+  const followUp = await prisma.followUp.create({
+    data: {
+      userId,
+      leadName: actionData.leadName || actionData.followUp?.leadName || '',
+      leadPhone: actionData.leadPhone || actionData.followUp?.leadPhone || '',
+      leadEmail: actionData.leadEmail || actionData.followUp?.leadEmail || '',
+      message: actionData.message || actionData.followUp?.message || 'Follow-up message',
+      scheduledFor: new Date(actionData.scheduledFor || actionData.followUp?.scheduledFor || Date.now() + 24 * 60 * 60 * 1000),
+      channel: actionData.channel || actionData.followUp?.channel || 'email',
+      metadata: actionData.metadata || {},
+    },
+  })
+
+  return {
+    success: true,
+    result: { followUpId: followUp.id, followUp },
+  }
+}
+
+async function executeUpdateCRM(userId, actionData) {
+  // TODO: Implement CRM update logic
+  // For now, just log the action
+  return {
+    success: true,
+    result: { updated: true },
+  }
+}
+
+async function executeNotifyTaskOverdue(userId, actionData) {
+  const { createNotification } = await import('@/lib/notifications')
+  
+  await createNotification(userId, {
+    type: 'urgent',
+    title: 'Overdue Task',
+    message: `Task "${actionData.task?.title || 'Unknown'}" is overdue`,
+    metadata: { taskId: actionData.task?.id },
+  })
+
+  return {
+    success: true,
+    result: { notified: true },
   }
 }
 

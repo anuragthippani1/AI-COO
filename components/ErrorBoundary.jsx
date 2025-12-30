@@ -48,7 +48,7 @@ class ErrorBoundary extends Component {
               Something went wrong
             </h2>
             <p className="text-gray-600 text-center mb-6">
-              We've been notified and are working on a fix. Please try refreshing the page.
+              We&apos;ve been notified and are working on a fix. Please try refreshing the page.
             </p>
             <div className="flex gap-2">
               <button
@@ -82,6 +82,7 @@ class ErrorBoundary extends Component {
 }
 
 export default ErrorBoundary
+
 
 
 

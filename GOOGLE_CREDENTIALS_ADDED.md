@@ -68,3 +68,10 @@ Your `.env` file is in `.gitignore` and won't be committed to git. The credentia
 **Next**: Complete Google Cloud Console setup → Restart server → Test connection
 
 
+
+
+
+
+
+
+

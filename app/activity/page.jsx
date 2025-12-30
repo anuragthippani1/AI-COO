@@ -50,13 +50,29 @@ export default function ActivityPage() {
   const handleApprove = async (log) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-      // TODO: Implement approval API endpoint
-      // For now, this is a placeholder
-      console.log('Approve action:', log.id)
-      alert('Approval functionality coming soon')
+      
+      // Find approval request ID from log metadata or use log ID
+      const approvalRequestId = log.metadata?.approvalRequestId || log.approvalRequestId || log.id
+
+      const response = await fetch('/api/ai/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ approvalRequestId }),
+      })
+
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to approve action')
+      }
+
+      // Refresh list after successful approval
+      fetchLogs()
     } catch (err) {
       console.error('Error approving action:', err)
-      alert('Failed to approve action')
+      alert(err.message || 'Failed to approve action')
     }
   }
 

@@ -180,13 +180,16 @@ export default function TasksPage() {
               )}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2 text-sm"
-            title="Most tasks are created automatically from emails"
-          >
-            <span>+</span> Manual Task
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Tasks are created automatically by AI</span>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+              title="Manual override - use only when needed"
+            >
+              Manual Override
+            </button>
+          </div>
         </div>
 
         {/* Messages */}

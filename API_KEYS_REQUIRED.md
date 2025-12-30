@@ -262,3 +262,10 @@ A: ~$5-20/month for OpenAI (moderate use), everything else can be free tier.
 - Twilio: https://www.twilio.com/
 
 
+
+
+
+
+
+
+

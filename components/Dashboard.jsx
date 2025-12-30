@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import {
@@ -24,17 +24,63 @@ import {
 export default function Dashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [agentLoopStatus, setAgentLoopStatus] = useState(null)
+
+  const checkAgentLoopStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const response = await fetch('/api/agent/loop', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setAgentLoopStatus(data.isRunning)
+      }
+    } catch (err) {
+      console.error('Error checking agent loop status:', err)
+    }
+  }, [])
+
+  const startAgentLoop = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const response = await fetch('/api/agent/loop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ action: 'start' }),
+      })
+
+      if (response.ok) {
+        checkAgentLoopStatus()
+      }
+    } catch (err) {
+      console.error('Error starting agent loop:', err)
+    }
+  }, [checkAgentLoopStatus])
 
   useEffect(() => {
     fetchDashboardData()
+    checkAgentLoopStatus()
+    startAgentLoop()
     // Refresh every 30 seconds
     const interval = setInterval(() => {
       fetchDashboardData()
+      checkAgentLoopStatus()
     }, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchDashboardData, checkAgentLoopStatus, startAgentLoop])
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
       if (!token) {
@@ -67,7 +113,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -142,7 +188,21 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex justify-between items-start pb-6 border-b border-gray-200">
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">AI COO Briefing</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-semibold text-gray-900">AI COO Briefing</h1>
+            {agentLoopStatus !== null && (
+              <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                agentLoopStatus 
+                  ? 'bg-emerald-100 text-emerald-700' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  agentLoopStatus ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'
+                }`}></div>
+                {agentLoopStatus ? 'Agents Active' : 'Agents Paused'}
+              </div>
+            )}
+          </div>
           <p className="text-sm text-gray-600 leading-relaxed">
             {data?.today?.summary || 'Here&apos;s what I handled for you today.'}
           </p>

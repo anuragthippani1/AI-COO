@@ -125,8 +125,9 @@ export class AgentLoop {
       })
 
       for (const user of users) {
-        // Check for daily summary time (9 AM)
         const now = new Date()
+        
+        // Check for daily summary time (9 AM)
         if (now.getHours() === 9 && now.getMinutes() < 5) {
           await eventSystem.emit(EVENTS.DAILY_SUMMARY_TIME, user.id, {})
         }
@@ -139,11 +140,17 @@ export class AgentLoop {
         // Check for overdue tasks
         await this.checkOverdueTasks(user.id)
 
+        // Check for tasks due soon (within 24 hours)
+        await this.checkTasksDueSoon(user.id)
+
         // Check for due follow-ups
         await this.checkDueFollowUps(user.id)
 
         // Check for overdue invoices
         await this.checkOverdueInvoices(user.id)
+
+        // Check for upcoming calendar events (within 1 hour)
+        await this.checkUpcomingCalendarEvents(user.id)
       }
     } catch (error) {
       console.error('[AgentLoop] Error checking time-based events:', error)
@@ -554,7 +561,7 @@ export class AgentLoop {
       const overdueInvoices = await prisma.invoice.findMany({
         where: {
           userId,
-          status: 'SENT',
+          status: { in: ['sent', 'SENT'] },
           dueDate: {
             lt: new Date(),
           },
@@ -562,10 +569,133 @@ export class AgentLoop {
       })
 
       for (const invoice of overdueInvoices) {
-        await eventSystem.emit(EVENTS.INVOICE_OVERDUE, userId, { invoiceId: invoice.id, invoice })
+        // Only emit if not already processed (check metadata for last reminder)
+        const lastReminder = invoice.metadata?.lastReminderAt
+        const shouldRemind = !lastReminder || 
+          (new Date() - new Date(lastReminder)) > 24 * 60 * 60 * 1000 // Remind once per day
+
+        if (shouldRemind) {
+          await eventSystem.emit(EVENTS.INVOICE_OVERDUE, userId, { invoiceId: invoice.id, invoice })
+          
+          // Mark reminder sent
+          await prisma.invoice.update({
+            where: { id: invoice.id },
+            data: {
+              metadata: {
+                ...(invoice.metadata || {}),
+                lastReminderAt: new Date().toISOString(),
+              },
+            },
+          })
+        }
       }
     } catch (error) {
       console.error('[AgentLoop] Error checking overdue invoices:', error)
+    }
+  }
+
+  /**
+   * Check for tasks due soon (within 24 hours)
+   */
+  async checkTasksDueSoon(userId) {
+    try {
+      const now = new Date()
+      const in24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+      const tasksDueSoon = await prisma.task.findMany({
+        where: {
+          userId,
+          status: { in: ['PENDING', 'IN_PROGRESS'] },
+          dueDate: {
+            gte: now,
+            lte: in24Hours,
+          },
+        },
+      })
+
+      for (const task of tasksDueSoon) {
+        // Check if we've already notified about this task (avoid spam)
+        const lastNotified = task.metadata?.lastDueSoonNotification
+        const hoursUntilDue = Math.floor((new Date(task.dueDate) - now) / (1000 * 60 * 60))
+        
+        // Notify if:
+        // - Never notified, OR
+        // - Last notified more than 6 hours ago, OR
+        // - Task is due within 2 hours (urgent reminder)
+        const shouldNotify = !lastNotified ||
+          (now - new Date(lastNotified)) > 6 * 60 * 60 * 1000 ||
+          hoursUntilDue <= 2
+
+        if (shouldNotify) {
+          await eventSystem.emit(EVENTS.TASK_DUE_SOON, userId, {
+            taskId: task.id,
+            task,
+            hoursUntilDue,
+          })
+
+          // Mark notification sent
+          await prisma.task.update({
+            where: { id: task.id },
+            data: {
+              metadata: {
+                ...(task.metadata || {}),
+                lastDueSoonNotification: new Date().toISOString(),
+              },
+            },
+          })
+        }
+      }
+    } catch (error) {
+      console.error('[AgentLoop] Error checking tasks due soon:', error)
+    }
+  }
+
+  /**
+   * Check for upcoming calendar events (within 1 hour)
+   */
+  async checkUpcomingCalendarEvents(userId) {
+    try {
+      const { listCalendarEvents } = await import('@/lib/calendar')
+      
+      const now = new Date()
+      const in1Hour = new Date(now.getTime() + 60 * 60 * 1000)
+
+      // Fetch events from Google Calendar
+      const events = await listCalendarEvents(
+        userId,
+        now.toISOString(),
+        in1Hour.toISOString()
+      )
+
+      for (const event of events) {
+        if (!event.start || !event.start.dateTime) continue
+
+        const eventStart = new Date(event.start.dateTime)
+        const minutesUntil = Math.floor((eventStart - now) / (1000 * 60))
+
+        // Only notify if event is within 60 minutes and not in the past
+        if (minutesUntil >= 0 && minutesUntil <= 60) {
+          // Check if we've already notified (avoid duplicate notifications)
+          const lastNotified = event.extendedProperties?.private?.lastReminderAt
+          const shouldNotify = !lastNotified || 
+            (now - new Date(lastNotified)) > 30 * 60 * 1000 // Remind once per 30 minutes
+
+          if (shouldNotify) {
+            await eventSystem.emit(EVENTS.CALENDAR_EVENT_SOON, userId, {
+              eventId: event.id,
+              eventTitle: event.summary || 'Untitled Event',
+              startTime: event.start.dateTime,
+              minutesUntil,
+              event,
+            })
+          }
+        }
+      }
+    } catch (error) {
+      // Silently fail if calendar is not connected - this is expected for some users
+      if (error.message !== 'Google Calendar not connected') {
+        console.error('[AgentLoop] Error checking upcoming calendar events:', error)
+      }
     }
   }
 }

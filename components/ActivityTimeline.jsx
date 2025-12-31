@@ -145,86 +145,86 @@ export default function ActivityTimeline({
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               statusFilter === 'all'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             All
           </button>
           <button
             onClick={() => setStatusFilter('handled')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               statusFilter === 'handled'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             Handled by AI
           </button>
           <button
             onClick={() => setStatusFilter('needs_approval')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               statusFilter === 'needs_approval'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             Needs Approval
           </button>
           <button
             onClick={() => setStatusFilter('risks')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               statusFilter === 'risks'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             Risks / Alerts
           </button>
         </div>
 
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
           <button
             onClick={() => setTimeFilter('all')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'all'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             All Time
           </button>
           <button
             onClick={() => setTimeFilter('today')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'today'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             Today
           </button>
           <button
             onClick={() => setTimeFilter('yesterday')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'yesterday'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             Yesterday
           </button>
           <button
             onClick={() => setTimeFilter('thisWeek')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'thisWeek'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             This Week

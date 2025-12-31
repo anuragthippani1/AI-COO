@@ -168,7 +168,7 @@ export default function ActivityItem({ log, onApprove, onRollback }) {
     : null
 
   return (
-    <div className={`p-5 border-l-4 ${statusColor} bg-white hover:bg-gray-50/50 transition-colors`}>
+    <div className={`p-5 border-l-4 ${statusColor} bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm`}>
       <div className="flex gap-4">
         {/* Left: Icon + Status Indicator */}
         <div className="flex-shrink-0">
@@ -245,7 +245,7 @@ export default function ActivityItem({ log, onApprove, onRollback }) {
               {needsApproval && onApprove && (
                 <button
                   onClick={() => onApprove(log)}
-                  className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 rounded-lg transition-all duration-200 shadow-sm hover:shadow"
                 >
                   Approve
                 </button>
@@ -253,12 +253,12 @@ export default function ActivityItem({ log, onApprove, onRollback }) {
               {canRollback && onRollback && (
                 <button
                   onClick={() => onRollback(log)}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
                 >
                   Undo
                 </button>
               )}
-              <button className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="px-4 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200">
                 View details
               </button>
             </div>

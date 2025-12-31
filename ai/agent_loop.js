@@ -257,8 +257,44 @@ export class AgentLoop {
    * Handle task due soon
    */
   async handleTaskDueSoon(userId, eventData) {
-    // TODO: Implement task due soon logic
-    console.log('[AgentLoop] Task due soon:', eventData)
+    try {
+      const { taskId } = eventData
+      const task = await prisma.task.findUnique({
+        where: { id: taskId },
+      })
+
+      if (!task || task.status === 'COMPLETED') return
+
+      // Decide whether to notify user about upcoming task
+      const decision = await makeDecision(
+        userId,
+        'notify_task_due_soon',
+        {
+          task,
+          hoursUntilDue: task.dueDate 
+            ? Math.floor((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60))
+            : null,
+        },
+        { task, event: EVENTS.TASK_OVERDUE }
+      )
+
+      if (decision.decision === 'auto_execute' && decision.executed) {
+        // Create notification
+        const { createNotification } = await import('@/lib/notifications')
+        await createNotification(userId, {
+          type: 'info',
+          title: 'Task Due Soon',
+          message: `Task "${task.title}" is due ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'soon'}`,
+          metadata: { taskId: task.id },
+        })
+        console.log(`[AgentLoop] Notified user about task due soon: ${taskId}`)
+      } else if (decision.approvalRequestId) {
+        console.log(`[AgentLoop] Task due soon notification pending approval: ${decision.approvalRequestId}`)
+      }
+    } catch (error) {
+      console.error('[AgentLoop] Error handling task due soon:', error)
+      await recordFailure(userId, 'notify_task_due_soon', error.message)
+    }
   }
 
   /**
@@ -297,16 +333,104 @@ export class AgentLoop {
    * Handle calendar event soon
    */
   async handleCalendarEventSoon(userId, eventData) {
-    // TODO: Implement calendar event reminder logic
-    console.log('[AgentLoop] Calendar event soon:', eventData)
+    try {
+      const { eventId, eventTitle, startTime, minutesUntil } = eventData
+
+      // Decide whether to send reminder
+      const decision = await makeDecision(
+        userId,
+        'send_calendar_reminder',
+        {
+          eventId,
+          eventTitle,
+          startTime,
+          minutesUntil,
+        },
+        { event: EVENTS.CALENDAR_EVENT_SOON, eventData }
+      )
+
+      if (decision.decision === 'auto_execute' && decision.executed) {
+        // Create notification
+        const { createNotification } = await import('@/lib/notifications')
+        await createNotification(userId, {
+          type: 'info',
+          title: 'Upcoming Event',
+          message: `"${eventTitle}" starts ${minutesUntil < 60 ? `in ${minutesUntil} minutes` : `in ${Math.floor(minutesUntil / 60)} hours`}`,
+          metadata: { eventId, startTime },
+        })
+        console.log(`[AgentLoop] Sent calendar reminder for event: ${eventId}`)
+      } else if (decision.approvalRequestId) {
+        console.log(`[AgentLoop] Calendar reminder pending approval: ${decision.approvalRequestId}`)
+      }
+    } catch (error) {
+      console.error('[AgentLoop] Error handling calendar event soon:', error)
+      await recordFailure(userId, 'send_calendar_reminder', error.message)
+    }
   }
 
   /**
    * Handle invoice overdue
    */
   async handleInvoiceOverdue(userId, eventData) {
-    // TODO: Implement invoice overdue logic
-    console.log('[AgentLoop] Invoice overdue:', eventData)
+    try {
+      const { invoiceId } = eventData
+      const invoice = await prisma.invoice.findUnique({
+        where: { id: invoiceId },
+      })
+
+      if (!invoice || invoice.status === 'paid') return
+
+      // Update invoice status to overdue
+      await prisma.invoice.update({
+        where: { id: invoiceId },
+        data: { status: 'overdue' },
+      })
+
+      // Decide whether to send reminder email
+      const decision = await makeDecision(
+        userId,
+        'send_invoice_reminder',
+        {
+          invoice,
+          daysOverdue: invoice.dueDate 
+            ? Math.floor((new Date() - new Date(invoice.dueDate)) / (1000 * 60 * 60 * 24))
+            : 0,
+        },
+        { invoice, event: EVENTS.INVOICE_OVERDUE }
+      )
+
+      if (decision.decision === 'auto_execute' && decision.executed && invoice.clientEmail) {
+        // Send reminder email
+        const { sendEmail } = await import('@/lib/gmail')
+        const invoiceUrl = invoice.pdfUrl 
+          ? `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}${invoice.pdfUrl}`
+          : null
+        
+        await sendEmail(
+          userId,
+          invoice.clientEmail,
+          `Reminder: Invoice ${invoice.invoiceNumber} is Overdue`,
+          `Dear ${invoice.clientName},\n\nThis is a reminder that invoice ${invoice.invoiceNumber} for $${invoice.total.toFixed(2)} is overdue.\n\n${invoiceUrl ? `View invoice: ${invoiceUrl}\n\n` : ''}Please arrange payment at your earliest convenience.\n\nThank you!`,
+          `<p>Dear ${invoice.clientName},</p><p>This is a reminder that invoice <strong>${invoice.invoiceNumber}</strong> for <strong>$${invoice.total.toFixed(2)}</strong> is overdue.</p>${invoiceUrl ? `<p><a href="${invoiceUrl}">View Invoice</a></p>` : ''}<p>Please arrange payment at your earliest convenience.</p><p>Thank you!</p>`
+        )
+        
+        console.log(`[AgentLoop] Sent overdue invoice reminder: ${invoiceId}`)
+      } else if (decision.approvalRequestId) {
+        console.log(`[AgentLoop] Invoice reminder pending approval: ${decision.approvalRequestId}`)
+      }
+
+      // Always create notification for overdue invoice
+      const { createNotification } = await import('@/lib/notifications')
+      await createNotification(userId, {
+        type: 'urgent',
+        title: 'Overdue Invoice',
+        message: `Invoice ${invoice.invoiceNumber} for $${invoice.total.toFixed(2)} is overdue`,
+        metadata: { invoiceId: invoice.id },
+      })
+    } catch (error) {
+      console.error('[AgentLoop] Error handling invoice overdue:', error)
+      await recordFailure(userId, 'send_invoice_reminder', error.message)
+    }
   }
 
   /**

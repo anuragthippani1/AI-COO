@@ -114,6 +114,24 @@ export async function executeAction(userId, actionType, actionData) {
       case 'notify_task_overdue':
         return await executeNotifyTaskOverdue(userId, actionData)
       
+      case 'create_invoice':
+        return await executeCreateInvoice(userId, actionData)
+      
+      case 'send_whatsapp':
+        return await executeSendWhatsApp(userId, actionData)
+      
+      case 'send_followup':
+        return await executeSendFollowUp(userId, actionData)
+      
+      case 'notify_task_due_soon':
+        return await executeNotifyTaskDueSoon(userId, actionData)
+      
+      case 'send_calendar_reminder':
+        return await executeSendCalendarReminder(userId, actionData)
+      
+      case 'send_invoice_reminder':
+        return await executeSendInvoiceReminder(userId, actionData)
+      
       default:
         return {
           success: false,
@@ -467,11 +485,96 @@ async function executeScheduleFollowUp(userId, actionData) {
 }
 
 async function executeUpdateCRM(userId, actionData) {
-  // TODO: Implement CRM update logic
-  // For now, just log the action
-  return {
-    success: true,
-    result: { updated: true },
+  try {
+    const { leadEmail, leadPhone, leadName, status, notes, source } = actionData
+    
+    // Update or create follow-up record as CRM entry
+    // In a full CRM system, this would update a Lead/Contact model
+    // For now, we use FollowUp as our CRM tracking mechanism
+    if (leadEmail || leadPhone) {
+      // Check if follow-up already exists
+      const existingFollowUp = await prisma.followUp.findFirst({
+        where: {
+          userId,
+          OR: [
+            leadEmail ? { leadEmail } : {},
+            leadPhone ? { leadPhone } : {},
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+
+      if (existingFollowUp) {
+        // Update existing follow-up with new status/notes
+        const updated = await prisma.followUp.update({
+          where: { id: existingFollowUp.id },
+          data: {
+            ...(status && { status }),
+            ...(notes && { 
+              message: notes,
+              metadata: {
+                ...(existingFollowUp.metadata || {}),
+                crmStatus: status,
+                lastUpdated: new Date().toISOString(),
+                source: source || 'ai_agent',
+              },
+            }),
+          },
+        })
+        
+        await saveMemory(userId, `CRM updated: ${leadName || leadEmail} - Status: ${status}`, {
+          type: 'crm',
+          source: 'agent',
+          followUpId: updated.id,
+        })
+
+        return {
+          success: true,
+          result: { followUpId: updated.id, updated: true },
+        }
+      } else {
+        // Create new follow-up as CRM entry
+        const newFollowUp = await prisma.followUp.create({
+          data: {
+            userId,
+            leadName: leadName || 'Unknown',
+            leadEmail: leadEmail || '',
+            leadPhone: leadPhone || '',
+            message: notes || 'CRM entry created',
+            scheduledFor: new Date(),
+            channel: 'email',
+            status: status || 'pending',
+            metadata: {
+              crmStatus: status || 'new',
+              source: source || 'ai_agent',
+              createdAt: new Date().toISOString(),
+            },
+          },
+        })
+
+        await saveMemory(userId, `CRM entry created: ${leadName || leadEmail}`, {
+          type: 'crm',
+          source: 'agent',
+          followUpId: newFollowUp.id,
+        })
+
+        return {
+          success: true,
+          result: { followUpId: newFollowUp.id, created: true },
+        }
+      }
+    }
+
+    return {
+      success: false,
+      error: 'Missing lead contact information (email or phone)',
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error updating CRM:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
   }
 }
 
@@ -488,6 +591,303 @@ async function executeNotifyTaskOverdue(userId, actionData) {
   return {
     success: true,
     result: { notified: true },
+  }
+}
+
+async function executeCreateInvoice(userId, actionData) {
+  try {
+    const { generateInvoicePDF } = await import('@/lib/invoice')
+    const { sendEmail } = await import('@/lib/gmail')
+    
+    const { clientName, clientEmail, items, tax = 0, dueDate, autoSend = false } = actionData
+
+    if (!clientName || !items || !Array.isArray(items)) {
+      return {
+        success: false,
+        error: 'Missing required fields: clientName and items',
+      }
+    }
+
+    // Calculate totals
+    const subtotal = items.reduce((sum, item) => {
+      return sum + (item.price * item.quantity)
+    }, 0)
+    const total = subtotal + tax
+
+    // Generate invoice number
+    const invoiceCount = await prisma.invoice.count({
+      where: { userId },
+    })
+    const invoiceNumber = `INV-${Date.now()}-${invoiceCount + 1}`
+
+    // Create invoice
+    const invoice = await prisma.invoice.create({
+      data: {
+        userId,
+        invoiceNumber,
+        clientName,
+        clientEmail: clientEmail || null,
+        items: items,
+        subtotal,
+        tax,
+        total,
+        status: 'draft',
+        dueDate: dueDate ? new Date(dueDate) : null,
+      },
+    })
+
+    // Generate PDF
+    const pdfUrl = await generateInvoicePDF(invoice)
+
+    // Update invoice with PDF URL
+    const updatedInvoice = await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { pdfUrl },
+    })
+
+    // Auto-send email if requested
+    if (autoSend && clientEmail) {
+      try {
+        const invoiceUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}${pdfUrl}`
+        await sendEmail(
+          userId,
+          clientEmail,
+          `Invoice ${invoiceNumber} from AI COO`,
+          `Dear ${clientName},\n\nPlease find attached invoice ${invoiceNumber}.\n\nTotal: $${total.toFixed(2)}\nDue Date: ${dueDate ? new Date(dueDate).toLocaleDateString() : 'N/A'}\n\nView invoice: ${invoiceUrl}\n\nThank you!`,
+          `<p>Dear ${clientName},</p><p>Please find attached invoice <strong>${invoiceNumber}</strong>.</p><p><strong>Total:</strong> $${total.toFixed(2)}<br><strong>Due Date:</strong> ${dueDate ? new Date(dueDate).toLocaleDateString() : 'N/A'}</p><p><a href="${invoiceUrl}">View Invoice</a></p><p>Thank you!</p>`
+        )
+        await prisma.invoice.update({
+          where: { id: invoice.id },
+          data: { status: 'sent' },
+        })
+      } catch (error) {
+        console.error('Error auto-sending invoice email:', error)
+        // Don't fail the request if email send fails
+      }
+    }
+
+    await saveMemory(userId, `Invoice created: ${invoiceNumber} for ${clientName}`, {
+      type: 'invoice',
+      source: 'agent',
+      invoiceId: invoice.id,
+    })
+
+    return {
+      success: true,
+      result: { invoiceId: invoice.id, invoice: updatedInvoice },
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error creating invoice:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+async function executeSendWhatsApp(userId, actionData) {
+  try {
+    const { sendWhatsAppMessage } = await import('@/lib/whatsapp')
+    
+    const { phoneNumber, message } = actionData
+
+    if (!phoneNumber || !message) {
+      return {
+        success: false,
+        error: 'Missing required fields: phoneNumber and message',
+      }
+    }
+
+    const sent = await sendWhatsAppMessage(phoneNumber, message)
+
+    if (sent) {
+      await saveMemory(userId, `WhatsApp sent to ${phoneNumber}`, {
+        type: 'whatsapp',
+        source: 'agent',
+        phoneNumber,
+      })
+    }
+
+    return {
+      success: sent,
+      result: { sent },
+      ...(sent ? {} : { error: 'Failed to send WhatsApp message' }),
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error sending WhatsApp:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+async function executeSendFollowUp(userId, actionData) {
+  try {
+    const { followUp } = actionData
+    if (!followUp || !followUp.id) {
+      return {
+        success: false,
+        error: 'Missing follow-up data',
+      }
+    }
+
+    const followUpRecord = await prisma.followUp.findUnique({
+      where: { id: followUp.id },
+    })
+
+    if (!followUpRecord || followUpRecord.status !== 'pending') {
+      return {
+        success: false,
+        error: 'Follow-up not found or already processed',
+      }
+    }
+
+    // Send via appropriate channel
+    if (followUpRecord.channel === 'whatsapp' && followUpRecord.leadPhone) {
+      const { sendWhatsAppMessage } = await import('@/lib/whatsapp')
+      const sent = await sendWhatsAppMessage(followUpRecord.leadPhone, followUpRecord.message)
+      
+      if (sent) {
+        await prisma.followUp.update({
+          where: { id: followUpRecord.id },
+          data: { status: 'sent', sentAt: new Date() },
+        })
+      }
+      
+      return {
+        success: sent,
+        result: { sent, channel: 'whatsapp' },
+      }
+    } else if (followUpRecord.channel === 'email' && followUpRecord.leadEmail) {
+      const { sendEmail } = await import('@/lib/gmail')
+      await sendEmail(
+        userId,
+        followUpRecord.leadEmail,
+        `Follow-up: ${followUpRecord.message.substring(0, 50)}...`,
+        followUpRecord.message
+      )
+      
+      await prisma.followUp.update({
+        where: { id: followUpRecord.id },
+        data: { status: 'sent', sentAt: new Date() },
+      })
+      
+      return {
+        success: true,
+        result: { sent: true, channel: 'email' },
+      }
+    }
+
+    return {
+      success: false,
+      error: 'Invalid channel or missing contact information',
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error sending follow-up:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+async function executeNotifyTaskDueSoon(userId, actionData) {
+  try {
+    const { createNotification } = await import('@/lib/notifications')
+    const { task, hoursUntilDue } = actionData
+    
+    const message = hoursUntilDue !== null
+      ? `Task "${task.title}" is due in ${hoursUntilDue} hours`
+      : `Task "${task.title}" is due soon`
+    
+    await createNotification(userId, {
+      type: 'info',
+      title: 'Task Due Soon',
+      message,
+      metadata: { taskId: task.id },
+    })
+
+    return {
+      success: true,
+      result: { notified: true },
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error notifying task due soon:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+async function executeSendCalendarReminder(userId, actionData) {
+  try {
+    const { createNotification } = await import('@/lib/notifications')
+    const { eventId, eventTitle, startTime, minutesUntil } = actionData
+    
+    const timeMessage = minutesUntil < 60
+      ? `in ${minutesUntil} minutes`
+      : `in ${Math.floor(minutesUntil / 60)} hours`
+    
+    await createNotification(userId, {
+      type: 'info',
+      title: 'Upcoming Event',
+      message: `"${eventTitle}" starts ${timeMessage}`,
+      metadata: { eventId, startTime },
+    })
+
+    return {
+      success: true,
+      result: { notified: true },
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error sending calendar reminder:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+async function executeSendInvoiceReminder(userId, actionData) {
+  try {
+    const { sendEmail } = await import('@/lib/gmail')
+    const { invoice, daysOverdue } = actionData
+    
+    if (!invoice.clientEmail) {
+      return {
+        success: false,
+        error: 'No client email available for invoice reminder',
+      }
+    }
+
+    const invoiceUrl = invoice.pdfUrl 
+      ? `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}${invoice.pdfUrl}`
+      : null
+    
+    const subject = daysOverdue > 0
+      ? `Reminder: Invoice ${invoice.invoiceNumber} is ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue`
+      : `Reminder: Invoice ${invoice.invoiceNumber} Payment Due`
+    
+    await sendEmail(
+      userId,
+      invoice.clientEmail,
+      subject,
+      `Dear ${invoice.clientName},\n\nThis is a reminder that invoice ${invoice.invoiceNumber} for $${invoice.total.toFixed(2)} ${daysOverdue > 0 ? `is ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue` : 'is due'}.\n\n${invoiceUrl ? `View invoice: ${invoiceUrl}\n\n` : ''}Please arrange payment at your earliest convenience.\n\nThank you!`,
+      `<p>Dear ${invoice.clientName},</p><p>This is a reminder that invoice <strong>${invoice.invoiceNumber}</strong> for <strong>$${invoice.total.toFixed(2)}</strong> ${daysOverdue > 0 ? `is <strong>${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue</strong>` : 'is due'}.</p>${invoiceUrl ? `<p><a href="${invoiceUrl}">View Invoice</a></p>` : ''}<p>Please arrange payment at your earliest convenience.</p><p>Thank you!</p>`
+    )
+
+    return {
+      success: true,
+      result: { sent: true, daysOverdue },
+    }
+  } catch (error) {
+    console.error('[AgentManager] Error sending invoice reminder:', error)
+    return {
+      success: false,
+      error: error.message,
+    }
   }
 }
 

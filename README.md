@@ -126,6 +126,7 @@ See `.env.example` for all required environment variables including:
     └── schema.prisma      # Database schema
 ```
 
+-----------------
 ## API Endpoints
 
 ### Authentication

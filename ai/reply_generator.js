@@ -194,4 +194,3 @@ function buildStyleInstructions(styleProfile) {
 
   return instructions.join('\n')
 }
-

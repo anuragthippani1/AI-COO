@@ -184,10 +184,10 @@ export default function TasksPage() {
             <span className="text-xs text-gray-500">Tasks are created automatically by AI</span>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-xs font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow"
               title="Manual override - use only when needed"
             >
-              Manual Override
+              + Manual Task
             </button>
           </div>
         </div>
@@ -216,40 +216,40 @@ export default function TasksPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 filter === 'all'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 filter === 'pending'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
               }`}
             >
               Pending
             </button>
             <button
               onClick={() => setFilter('in_progress')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 filter === 'in_progress'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
               }`}
             >
               In Progress
             </button>
             <button
               onClick={() => setFilter('completed')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 filter === 'completed'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow'
               }`}
             >
               Completed
@@ -259,7 +259,7 @@ export default function TasksPage() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow"
             >
               <option value="all">All Priorities</option>
               <option value="urgent">Urgent</option>
@@ -292,7 +292,7 @@ export default function TasksPage() {
             {filter === 'all' && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+                className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2 rounded-lg hover:from-gray-800 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm font-medium"
               >
                 Create Your First Task
               </button>
@@ -367,7 +367,7 @@ export default function TasksPage() {
                           e.stopPropagation()
                           setEditingTask(task)
                         }}
-                        className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-3 py-1.5 text-sm font-medium bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow"
                         title="Edit task"
                       >
                         Edit
@@ -377,7 +377,7 @@ export default function TasksPage() {
                           e.stopPropagation()
                           deleteTask(task.id)
                         }}
-                        className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-3 py-1.5 text-sm font-medium bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-50 hover:border-red-400 transition-all duration-200 shadow-sm hover:shadow"
                         title="Delete task"
                       >
                         Delete
@@ -477,7 +477,7 @@ export default function TasksPage() {
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={createTask}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2.5 rounded-lg hover:from-gray-800 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
                   >
                     Create Task
                   </button>
@@ -486,7 +486,7 @@ export default function TasksPage() {
                       setShowCreateModal(false)
                       setNewTask({ title: '', description: '', priority: 'MEDIUM', status: 'PENDING', dueDate: '' })
                     }}
-                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow font-medium"
                   >
                     Cancel
                   </button>
@@ -584,13 +584,13 @@ export default function TasksPage() {
                       status: editingTask.status,
                       dueDate: editingTask.dueDate,
                     })}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2.5 rounded-lg hover:from-gray-800 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
                   >
                     Save Changes
                   </button>
                   <button
                     onClick={() => setEditingTask(null)}
-                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow font-medium"
                   >
                     Cancel
                   </button>

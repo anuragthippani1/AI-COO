@@ -375,7 +375,7 @@ export default function AutomationsPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 text-sm"
+            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
           >
             <span>+</span> Create Automation
           </button>
@@ -431,16 +431,16 @@ export default function AutomationsPage() {
             {workflows.map((workflow) => (
               <div
                 key={workflow.id}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:border-gray-300 transition-colors"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-200 group"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">{workflow.name}</h3>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{workflow.name}</h3>
                       <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                           workflow.isActive
-                            ? 'bg-gray-900 text-white'
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm'
                             : 'bg-gray-100 text-gray-600 border border-gray-200'
                         }`}
                       >
@@ -476,49 +476,49 @@ export default function AutomationsPage() {
                 </div>
 
                 {workflow.isActive && (
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-xs text-gray-600 font-medium mb-1">When will it run?</p>
-                    <p className="text-xs text-gray-500">
+                  <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-lg border border-indigo-100">
+                    <p className="text-xs text-indigo-700 font-medium mb-1">When will it run?</p>
+                    <p className="text-xs text-indigo-600">
                       {getTriggerDescription(workflow.trigger)}
                     </p>
                   </div>
                 )}
 
-                <div className="flex gap-2 pt-4 border-t border-gray-200">
+                <div className="flex gap-2 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => handleTest(workflow)}
-                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
                     title="Test this automation"
                   >
                     Test
                   </button>
                   <button
                     onClick={() => handlePreview(workflow)}
-                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
                     title="Preview AI action before running"
                   >
                     Preview
                   </button>
                   <button
                     onClick={() => handleToggle(workflow)}
-                    className={`flex-1 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                    className={`flex-1 px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium ${
                       workflow.isActive
-                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
+                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 shadow-sm hover:shadow-md'
                     }`}
                   >
                     {workflow.isActive ? 'Disable' : 'Enable'}
                   </button>
                   <button
                     onClick={() => setEditingWorkflow(workflow)}
-                    className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
                     title="Edit automation"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(workflow.id)}
-                    className="px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-50 hover:border-red-400 transition-all duration-200 font-medium"
                     title="Delete automation"
                   >
                     Delete
@@ -756,7 +756,7 @@ export default function AutomationsPage() {
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={createWorkflow}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                   >
                     Create Automation
                   </button>
@@ -772,7 +772,7 @@ export default function AutomationsPage() {
                       })
                       setShowTemplates(false)
                     }}
-                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
                   >
                     Cancel
                   </button>
@@ -860,13 +860,13 @@ export default function AutomationsPage() {
                       trigger: editingWorkflow.trigger,
                       isActive: editingWorkflow.isActive,
                     })}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                   >
                     Save Changes
                   </button>
                   <button
                     onClick={() => setEditingWorkflow(null)}
-                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
                   >
                     Cancel
                   </button>

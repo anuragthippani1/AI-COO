@@ -706,9 +706,7 @@ async function executeSendWhatsApp(userId, actionData) {
         source: 'agent',
         phoneNumber,
       })
-    }
-
-    return {
+    }    return {
       success: sent,
       result: { sent },
       ...(sent ? {} : { error: 'Failed to send WhatsApp message' }),

@@ -190,7 +190,5 @@ function buildStyleInstructions(styleProfile) {
     instructions.push(`- Preferred phrases/vocabulary: ${styleProfile.vocabulary.join(', ')}`)
   }
 
-  instructions.push(`\nIMPORTANT: Start with "${styleProfile.greeting || 'Hi'}" and end with "${styleProfile.closing || 'Thanks'}". Match the tone, formality, and vocabulary exactly.`)
-
-  return instructions.join('\n')
+  instructions.push(`\nIMPORTANT: Start with "${styleProfile.greeting || 'Hi'}" and end with "${styleProfile.closing || 'Thanks'}". Match the tone, formality, and vocabulary exactly.`)  return instructions.join('\n')
 }

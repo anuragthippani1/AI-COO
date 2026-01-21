@@ -391,8 +391,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'border-indigo-600 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-blue-300'
                 }`}
               >
                 {tab.name}
@@ -437,7 +437,7 @@ export default function SettingsPage() {
                   <button
                     onClick={saveProfile}
                     disabled={saving}
-                    className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
               </div>
               
               {/* Gmail Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -592,7 +592,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Calendar Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -660,7 +660,7 @@ export default function SettingsPage() {
               </div>
 
               {/* WhatsApp Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -837,7 +837,7 @@ export default function SettingsPage() {
                   <button
                     onClick={saveNotifications}
                     disabled={saving}
-                    className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     {saving ? 'Saving...' : 'Save Preferences'}
                   </button>

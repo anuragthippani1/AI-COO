@@ -375,7 +375,7 @@ export default function AutomationsPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm font-medium"
           >
             <span>+</span> Create Automation
           </button>
@@ -431,17 +431,17 @@ export default function AutomationsPage() {
             {workflows.map((workflow) => (
               <div
                 key={workflow.id}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-200 group"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-200 group"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{workflow.name}</h3>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{workflow.name}</h3>
                       <span
                         className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                           workflow.isActive
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm'
-                            : 'bg-gray-100 text-gray-600 border border-gray-200'
+                            ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-600 border border-gray-300'
                         }`}
                       >
                         {workflow.isActive ? 'Active' : 'Inactive'}
@@ -476,9 +476,9 @@ export default function AutomationsPage() {
                 </div>
 
                 {workflow.isActive && (
-                  <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-lg border border-indigo-100">
-                    <p className="text-xs text-indigo-700 font-medium mb-1">When will it run?</p>
-                    <p className="text-xs text-indigo-600">
+                  <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50 rounded-lg border border-blue-200 shadow-sm">
+                    <p className="text-xs text-blue-700 font-medium mb-1">When will it run?</p>
+                    <p className="text-xs text-blue-600">
                       {getTriggerDescription(workflow.trigger)}
                     </p>
                   </div>
@@ -756,7 +756,7 @@ export default function AutomationsPage() {
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={createWorkflow}
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                    className="flex-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
                   >
                     Create Automation
                   </button>
@@ -860,7 +860,7 @@ export default function AutomationsPage() {
                       trigger: editingWorkflow.trigger,
                       isActive: editingWorkflow.isActive,
                     })}
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                    className="flex-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
                   >
                     Save Changes
                   </button>

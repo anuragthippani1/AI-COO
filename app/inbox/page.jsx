@@ -136,7 +136,7 @@ export default function InboxPage() {
             <p className="text-gray-600 mt-1">
               {emails.length} email{emails.length !== 1 ? 's' : ''} total
               {emails.filter(e => e.isProcessed).length > 0 && (
-                <span className="ml-2 text-sm text-indigo-600">
+                  <span className="ml-2 text-sm text-blue-600 font-medium">
                   • {emails.filter(e => e.isProcessed).length} processed by AI
                 </span>
               )}
@@ -146,7 +146,7 @@ export default function InboxPage() {
             <button
               onClick={() => fetchEmails(true)}
               disabled={fetching || loading}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-lg hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 text-sm font-medium"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm font-medium"
               title="Emails are automatically processed when fetched"
             >
               {fetching ? (

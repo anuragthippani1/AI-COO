@@ -245,7 +245,7 @@ export default function ActivityItem({ log, onApprove, onRollback }) {
               {needsApproval && onApprove && (
                 <button
                   onClick={() => onApprove(log)}
-                  className="px-4 py-2 text-xs font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 rounded-lg transition-all duration-200 shadow-sm hover:shadow"
+                  className="px-4 py-2 text-xs font-medium text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   Approve
                 </button>

@@ -173,7 +173,7 @@ export default function Dashboard() {
               setLoading(true)
               fetchDashboardData()
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
@@ -209,7 +209,7 @@ export default function Dashboard() {
         </div>
         <button
           onClick={fetchDashboardData}
-          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 shadow-md hover:shadow-lg"
+          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh
@@ -286,7 +286,7 @@ export default function Dashboard() {
                   <div className="flex gap-2">
                     <Link
                       href={`/activity?approval=${approval.id}`}
-                      className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       Review
                     </Link>
@@ -343,14 +343,14 @@ export default function Dashboard() {
           <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                  <Activity className="w-4 h-4 text-indigo-600" />
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
+                  <Activity className="w-4 h-4 text-blue-600" />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900">What I Did Today</h2>
               </div>
               <Link
                 href="/activity"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
               >
                 View all
                 <ArrowRight className="w-4 h-4" />
@@ -361,7 +361,7 @@ export default function Dashboard() {
             {data.activities.slice(0, 10).map((activity) => (
               <div
                 key={activity.id}
-                className="p-4 rounded-lg border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all"
+                className="p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all"
               >
                 <div className="flex items-start gap-3">
                   <span className="text-xl mt-0.5">{activity.icon}</span>
@@ -405,7 +405,7 @@ export default function Dashboard() {
           <p className="text-xs text-gray-500 mb-6">Connect your Gmail account to start processing emails automatically</p>
           <Link
             href="/settings"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
           >
             <Settings className="w-4 h-4" />
             Go to Settings

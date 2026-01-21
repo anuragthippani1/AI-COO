@@ -58,19 +58,19 @@ export default function AgentsPage() {
     if (status === 'active') {
       if (activityCount > 0) {
         return (
-          <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium rounded-full shadow-sm">
+          <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white text-xs font-medium rounded-full shadow-md">
             Active • {activityCount} actions
           </span>
         )
       }
       return (
-        <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-200">
+        <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-300 shadow-sm">
           Active
         </span>
       )
     }
     return (
-      <span className="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full border border-gray-200">
+      <span className="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full border border-gray-300">
         Inactive
       </span>
     )
@@ -90,7 +90,7 @@ export default function AgentsPage() {
           <button
             onClick={fetchAgents}
             disabled={loading}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm font-medium"
           >
             {loading ? (
               <>
@@ -142,14 +142,14 @@ export default function AgentsPage() {
             {agents.map((agent) => (
               <div
                 key={agent.id}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-200 cursor-pointer group"
                 onClick={() => setSelectedAgent(agent)}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="text-3xl group-hover:scale-110 transition-transform duration-200">{getAgentIcon(agent.name)}</div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{agent.name}</h3>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{agent.name}</h3>
                       {getStatusBadge(agent.status, agent.activityCount)}
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default function AgentsPage() {
                       {agent.capabilities.slice(0, 3).map((cap, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-gradient-to-r from-indigo-50 to-violet-50 text-indigo-700 px-2.5 py-1 rounded-lg border border-indigo-100 font-medium"
+                          className="text-xs bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200 font-medium"
                         >
                           {cap}
                         </span>
@@ -186,7 +186,7 @@ export default function AgentsPage() {
                     <div>{agent.lastRun || 'Never'}</div>
                   </div>
                   {agent.activityCount > 0 && (
-                    <div className="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2.5 py-1 rounded-full">
+                    <div className="text-xs text-blue-600 font-semibold bg-gradient-to-r from-blue-50 to-cyan-50 px-2.5 py-1 rounded-full border border-blue-200">
                       {agent.activityCount} actions
                     </div>
                   )}
@@ -274,7 +274,7 @@ export default function AgentsPage() {
                         // Future: Configure agent
                         alert('Agent configuration coming soon!')
                       }}
-                      className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium"
+                      className="flex-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm font-medium"
                     >
                       Configure
                     </button>

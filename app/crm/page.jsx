@@ -103,7 +103,7 @@ export default function CRMPage() {
       contacted: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       qualified: 'bg-purple-100 text-purple-700 border-purple-200',
       proposal_sent: 'bg-orange-100 text-orange-700 border-orange-200',
-      negotiation: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      negotiation: 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200',
       won: 'bg-green-100 text-green-700 border-green-200',
       lost: 'bg-red-100 text-red-700 border-red-200',
     }
@@ -119,7 +119,7 @@ export default function CRMPage() {
             <p className="text-gray-600 mt-1">
               Manage your sales pipeline
               {leads.filter(l => l.source === 'email' || l.source === 'ai_detected').length > 0 && (
-                <span className="ml-2 text-sm text-indigo-600">
+                <span className="ml-2 text-sm text-blue-600 font-medium">
                   • {leads.filter(l => l.source === 'email' || l.source === 'ai_detected').length} AI-detected
                 </span>
               )}

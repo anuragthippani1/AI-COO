@@ -193,7 +193,7 @@ export default function ActivityTimeline({
             onClick={() => setTimeFilter('all')}
             className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'all'
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -203,7 +203,7 @@ export default function ActivityTimeline({
             onClick={() => setTimeFilter('today')}
             className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'today'
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -213,7 +213,7 @@ export default function ActivityTimeline({
             onClick={() => setTimeFilter('yesterday')}
             className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'yesterday'
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -223,7 +223,7 @@ export default function ActivityTimeline({
             onClick={() => setTimeFilter('thisWeek')}
             className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
               timeFilter === 'thisWeek'
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >

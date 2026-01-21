@@ -174,7 +174,7 @@ export default function TasksPage() {
             <p className="text-gray-600 mt-1">
               {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} {filter !== 'all' ? `(${filter})` : ''}
               {filteredTasks.filter(t => t.source === 'email' || t.source === 'ai_generated').length > 0 && (
-                <span className="ml-2 text-sm text-indigo-600">
+                <span className="ml-2 text-sm text-blue-600 font-medium">
                   • {filteredTasks.filter(t => t.source === 'email' || t.source === 'ai_generated').length} AI-created
                 </span>
               )}
@@ -339,7 +339,7 @@ export default function TasksPage() {
                       )}
                       <div className="flex items-center gap-3 flex-wrap ml-8">
                         {(task.source === 'email' || task.source === 'ai_generated') && (
-                          <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium border border-indigo-200">
+                          <span className="px-2 py-1 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 rounded text-xs font-medium border border-blue-200">
                             🤖 AI Created
                           </span>
                         )}

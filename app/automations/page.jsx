@@ -504,7 +504,7 @@ export default function AutomationsPage() {
                     className={`flex-1 px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium ${
                       workflow.isActive
                         ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
-                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 shadow-sm hover:shadow-md'
+                        : 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 shadow-sm hover:shadow-md'
                     }`}
                   >
                     {workflow.isActive ? 'Disable' : 'Enable'}

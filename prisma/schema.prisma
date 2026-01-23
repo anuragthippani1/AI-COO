@@ -336,9 +336,7 @@ model ActivityLog {
   outputData     Json? // Output/result
   metadata       Json? // Additional data
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)  @@index([userId, createdAt])
+  updatedAt      DateTime @updatedAt  user User @relation(fields: [userId], references: [id], onDelete: Cascade)  @@index([userId, createdAt])
   @@index([userId, actionType])
   @@index([userId, status])
   @@map("activity_logs")

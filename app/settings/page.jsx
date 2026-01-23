@@ -582,7 +582,7 @@ export default function SettingsPage() {
                             setErrorMessage(`Failed to connect Gmail: ${error.message}`)
                           }
                         }}
-                        className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                        className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                       >
                         Connect
                       </button>
@@ -745,7 +745,7 @@ export default function SettingsPage() {
                         {billing.canUpgrade && (
                           <button
                             onClick={() => handleUpgrade('pro')}
-                            className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-violet-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                            className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                           >
                             Upgrade
                           </button>
@@ -863,7 +863,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
                         <div
-                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full transition-all"
                           style={{
                             width: `${Math.min(100, usageStats.percentage?.actions || 0)}%`,
                           }}
@@ -883,7 +883,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
                         <div
-                          className="bg-violet-600 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all"
                           style={{
                             width: `${Math.min(100, usageStats.percentage?.tokens || 0)}%`,
                           }}

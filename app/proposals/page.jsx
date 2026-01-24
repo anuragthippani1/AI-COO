@@ -112,7 +112,7 @@ export default function ProposalsPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 text-sm"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
           >
             <span>+</span> Create Proposal
           </button>
@@ -151,7 +151,7 @@ export default function ProposalsPage() {
             <p className="text-sm text-gray-400 mb-6">Create your first proposal to get started</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+              className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium"
             >
               Create Proposal
             </button>
@@ -161,7 +161,7 @@ export default function ProposalsPage() {
             {proposals.map((proposal) => (
               <div
                 key={proposal.id}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-200 hover:shadow-md transition-all duration-200"
               >
                 <h3 className="font-semibold text-gray-900 mb-2">{proposal.projectTitle}</h3>
                 <p className="text-sm text-gray-500 mb-4">{proposal.clientName}</p>
@@ -169,7 +169,7 @@ export default function ProposalsPage() {
                   <span className="text-sm font-semibold text-gray-900">
                     ${proposal.total?.toFixed(2) || '0.00'}
                   </span>
-                  <button className="text-sm text-gray-600 hover:text-gray-900">
+                  <button className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
                     View →
                   </button>
                 </div>
@@ -201,7 +201,7 @@ export default function ProposalsPage() {
                     type="text"
                     value={newProposal.clientName}
                     onChange={(e) => setNewProposal({ ...newProposal, clientName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Client name"
                   />
                 </div>
@@ -214,7 +214,7 @@ export default function ProposalsPage() {
                     type="email"
                     value={newProposal.clientEmail}
                     onChange={(e) => setNewProposal({ ...newProposal, clientEmail: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="client@example.com"
                   />
                 </div>
@@ -227,7 +227,7 @@ export default function ProposalsPage() {
                     type="text"
                     value={newProposal.projectTitle}
                     onChange={(e) => setNewProposal({ ...newProposal, projectTitle: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Project title"
                   />
                 </div>
@@ -239,7 +239,7 @@ export default function ProposalsPage() {
                   <textarea
                     value={newProposal.description}
                     onChange={(e) => setNewProposal({ ...newProposal, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     rows={3}
                     placeholder="Project description"
                   />
@@ -264,7 +264,7 @@ export default function ProposalsPage() {
                             placeholder="Description"
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                           <div className="flex gap-2">
                             <input
@@ -272,14 +272,14 @@ export default function ProposalsPage() {
                               placeholder="Qty"
                               value={item.quantity}
                               onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                              className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                             <input
                               type="number"
                               placeholder="Price"
                               value={item.price}
                               onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
                         </div>
@@ -307,14 +307,14 @@ export default function ProposalsPage() {
                     type="date"
                     value={newProposal.validUntil}
                     onChange={(e) => setNewProposal({ ...newProposal, validUntil: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
                 <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <button
                     onClick={createProposal}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                   >
                     Create Proposal
                   </button>

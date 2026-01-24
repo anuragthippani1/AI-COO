@@ -213,7 +213,7 @@ export default function WhatsAppPage() {
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
           {/* Conversations List */}
-          <div className="bg-white rounded-xl border border-gray-200 flex flex-col">
+          <div className="bg-white rounded-xl border border-gray-200 flex flex-col shadow-sm">
             <div className="p-4 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900">Conversations</h2>
             </div>
@@ -228,9 +228,9 @@ export default function WhatsAppPage() {
                     <button
                       key={conv.id}
                       onClick={() => selectConversation(conv)}
-                      className={`w-full text-left p-4 hover:bg-gray-50 transition-colors ${
+                      className={`w-full text-left p-4 hover:bg-gray-50 transition-all duration-200 ${
                         selectedConversation?.phoneNumber === conv.phoneNumber
-                          ? 'bg-gray-100 border-l-4 border-gray-900'
+                          ? 'bg-blue-50 border-l-4 border-blue-500'
                           : ''
                       }`}
                     >
@@ -249,7 +249,7 @@ export default function WhatsAppPage() {
           </div>
 
           {/* Chat Area */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 flex flex-col">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 flex flex-col shadow-sm">
             {/* Chat Header */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -280,7 +280,7 @@ export default function WhatsAppPage() {
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
                           msg.sent
-                            ? 'bg-gray-900 text-white'
+                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
                             : 'bg-gray-100 text-gray-900'
                         }`}
                       >
@@ -315,7 +315,7 @@ export default function WhatsAppPage() {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+1234567890"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 />
               </div>
               <div className="flex gap-2">
@@ -330,12 +330,12 @@ export default function WhatsAppPage() {
                   }}
                   placeholder="Type your message..."
                   rows={2}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm resize-none"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
                 />
                 <button
                   onClick={sendMessage}
                   disabled={loading || !newMessage.trim() || !phoneNumber.trim()}
-                  className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   {loading ? 'Sending...' : 'Send'}
                 </button>

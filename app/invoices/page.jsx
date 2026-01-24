@@ -151,7 +151,7 @@ export default function InvoicesPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 text-sm"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
           >
             <span>+</span> Create Invoice
           </button>
@@ -178,10 +178,10 @@ export default function InvoicesPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
                 statusFilter === status
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -208,7 +208,7 @@ export default function InvoicesPage() {
             <p className="text-sm text-gray-400 mb-6">Create your first invoice to get started</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+              className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium"
             >
               Create Invoice
             </button>
@@ -218,7 +218,7 @@ export default function InvoicesPage() {
             {invoices.map((invoice) => (
               <div
                 key={invoice.id}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-200 hover:shadow-md transition-all duration-200"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -260,7 +260,7 @@ export default function InvoicesPage() {
                 <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => downloadInvoice(invoice.id)}
-                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all duration-200"
                   >
                     Download
                   </button>
@@ -303,7 +303,7 @@ export default function InvoicesPage() {
                     type="text"
                     value={newInvoice.clientName}
                     onChange={(e) => setNewInvoice({ ...newInvoice, clientName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Client name"
                   />
                 </div>
@@ -316,7 +316,7 @@ export default function InvoicesPage() {
                     type="email"
                     value={newInvoice.clientEmail}
                     onChange={(e) => setNewInvoice({ ...newInvoice, clientEmail: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="client@example.com"
                   />
                 </div>
@@ -340,7 +340,7 @@ export default function InvoicesPage() {
                             placeholder="Description"
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                           <div className="flex gap-2">
                             <input
@@ -348,14 +348,14 @@ export default function InvoicesPage() {
                               placeholder="Qty"
                               value={item.quantity}
                               onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                              className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                             <input
                               type="number"
                               placeholder="Price"
                               value={item.price}
                               onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
                         </div>
@@ -379,7 +379,7 @@ export default function InvoicesPage() {
                       type="number"
                       value={newInvoice.tax}
                       onChange={(e) => setNewInvoice({ ...newInvoice, tax: parseFloat(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -388,7 +388,7 @@ export default function InvoicesPage() {
                       type="date"
                       value={newInvoice.dueDate}
                       onChange={(e) => setNewInvoice({ ...newInvoice, dueDate: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export default function InvoicesPage() {
                 <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <button
                     onClick={createInvoice}
-                    className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                   >
                     Create Invoice
                   </button>

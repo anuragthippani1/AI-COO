@@ -41,9 +41,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6">Create Account</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-xl p-8 border border-gray-100">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">Create Account</h1>
+          <p className="text-sm text-gray-500">Get started with AI COO</p>
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
@@ -95,10 +98,10 @@ export default function RegisterPage() {
             />
           </div>
 
-          <button
+            <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-100 text-gray-900 font-medium py-2 px-4 rounded-md hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white font-medium py-2 px-4 rounded-md hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
           >
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>
@@ -106,7 +109,7 @@ export default function RegisterPage() {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link href="/login" className="text-primary-600 hover:text-primary-700">
+          <Link href="/login" className="text-blue-600 hover:text-cyan-600 font-medium transition-colors">
             Login
           </Link>
         </p>

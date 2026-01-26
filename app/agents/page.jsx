@@ -166,7 +166,7 @@ export default function AgentsPage() {
                       {agent.capabilities.slice(0, 3).map((cap, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200 font-medium"
+                          className="text-xs bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200 font-medium"
                         >
                           {cap}
                         </span>

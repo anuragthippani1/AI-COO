@@ -476,7 +476,7 @@ export default function AutomationsPage() {
                 </div>
 
                 {workflow.isActive && (
-                  <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50 rounded-lg border border-blue-200 shadow-sm">
+                  <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50 rounded-lg border border-blue-200 shadow-sm">
                     <p className="text-xs text-blue-700 font-medium mb-1">When will it run?</p>
                     <p className="text-xs text-blue-600">
                       {getTriggerDescription(workflow.trigger)}

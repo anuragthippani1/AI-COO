@@ -128,7 +128,7 @@ export default function ReportsPage() {
                 value={stats.emails?.unread || 0}
                 subValue="Need attention"
                 icon="📧"
-                gradient="from-purple-500 to-purple-600"
+                gradient="from-cyan-500 to-cyan-600"
               />
               <StatCard
                 title="Pending Follow-ups"

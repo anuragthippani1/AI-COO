@@ -462,7 +462,7 @@ export default function SettingsPage() {
               </div>
               
               {/* Gmail Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -592,7 +592,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Calendar Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -660,7 +660,7 @@ export default function SettingsPage() {
               </div>
 
               {/* WhatsApp Integration */}
-              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30">
+              <div className="border border-gray-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

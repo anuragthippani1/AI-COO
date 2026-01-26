@@ -42,7 +42,7 @@ export default function Sidebar() {
       {/* Logo Section */}
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 via-cyan-500 to-purple-500 flex items-center justify-center shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
             <span className="text-white text-sm font-bold">AI</span>
           </div>
           <div>
@@ -65,13 +65,13 @@ export default function Sidebar() {
               href={item.href}
               className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50 text-blue-700 font-medium'
+                  ? 'bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50 text-blue-700 font-medium'
                   : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
               {/* Left border indicator for active item */}
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-500 via-cyan-500 to-purple-500 rounded-r-full" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-500 via-cyan-500 to-blue-600 rounded-r-full" />
               )}
               <Icon
                 className={`w-5 h-5 flex-shrink-0 transition-colors ${

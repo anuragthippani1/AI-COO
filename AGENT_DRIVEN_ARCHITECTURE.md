@@ -13,14 +13,14 @@ The AI COO system has been refactored into a fully agent-driven architecture whe
 
 ### 1. Event System (`lib/event_system.js`)
 Central event emitter/listener for all system events:
-- `NEW_EMAIL_RECEIVED` - New email detected
-- `TASK_OVERDUE` - Task past due date
-- `FOLLOWUP_DUE` - Follow-up scheduled time reached
-- `INVOICE_OVERDUE` - Invoice past due
-- `DAILY_SUMMARY_TIME` - Daily summary generation time
-- `WEEKLY_PLANNING_TIME` - Weekly planner generation time
-- `USER_APPROVAL_RECEIVED` - User approved an action
-- `USER_REJECTION_RECEIVED` - User rejected an action
+- **Email:** `NEW_EMAIL_RECEIVED`, `EMAIL_REPLY_NEEDED`
+- **Tasks:** `TASK_OVERDUE`, `TASK_DUE_SOON`
+- **Follow-ups:** `FOLLOWUP_DUE`, `FOLLOWUP_OVERDUE`
+- **Calendar:** `CALENDAR_EVENT_SOON`, `CALENDAR_EVENT_STARTING`
+- **Financial:** `INVOICE_OVERDUE`, `INVOICE_DUE_SOON`
+- **Time-based:** `DAILY_SUMMARY_TIME`, `WEEKLY_PLANNING_TIME`, `END_OF_DAY`
+- **CRM:** `LEAD_STALE`, `LEAD_QUALIFIED`
+- **User:** `USER_APPROVAL_RECEIVED`, `USER_REJECTION_RECEIVED`
 
 ### 2. Agent Loop (`ai/agent_loop.js`)
 Central continuous loop that:
@@ -69,10 +69,11 @@ State-based approval system:
 
 ## UI Changes
 
-### Deprecated Manual Actions
-- "Create Task" → Changed to "Manual Override" (de-emphasized)
-- "Create Follow-up" → Removed (agents create automatically)
-- "Send Reply" → Removed (agents send automatically)
+### Deprecated / De-emphasized Manual Actions
+- "Create Task" → "Manual Task" (de-emphasized; AI creates most tasks)
+- "Create Follow-up" → Agents create automatically
+- "Send Reply" → Agents send automatically
+- "Add Lead" → "Manual Lead" (AI-detected leads surfaced in CRM)
 
 ### New Actions
 - **Review** - View agent-created items
@@ -89,26 +90,28 @@ State-based approval system:
 
 ### High Priority
 - [ ] Refactor `inbox_automation.js` to use `agent_manager.makeDecision()` for all actions
-- [ ] Wire approval UI buttons to `/api/ai/approve` and `/api/ai/reject`
 - [ ] Add autonomy level configuration to Settings page
-- [ ] Implement execution for all action types in `executeAction()`
 
 ### Medium Priority
 - [ ] Add webhook support for external event triggers
-- [ ] Implement calendar event reminder logic
-- [ ] Complete invoice overdue handling
-- [ ] Add task due soon notifications
-
-### Low Priority
-- [ ] Add agent loop status indicator to Dashboard
 - [ ] Create admin panel for monitoring agent loop
-- [ ] Add agent performance metrics
+
+### Completed
+- [x] Wire approval UI to `/api/ai/approve` and `/api/ai/reject`
+- [x] Implement execution for action types in `executeAction()` (tasks, email, follow-ups, CRM, notifications, invoices, WhatsApp, calendar reminders)
+- [x] Agent loop status indicator on Dashboard (Agents Active / Paused)
+- [x] Task due soon notifications (`TASK_DUE_SOON`)
+- [x] Calendar event reminder logic (`CALENDAR_EVENT_SOON`)
+- [x] Invoice overdue handling with reminder throttling
 
 ## API Endpoints
 
 ### Agent Loop Control
 - `POST /api/agent/loop` - Start/stop agent loop
 - `GET /api/agent/loop` - Get agent loop status
+
+### Agent Run (User-Initiated)
+- `POST /api/agent/run` - Run agent for user commands, queries, or manual overrides (body: `{ type, content, metadata }`). Event-driven automation uses the agent loop instead.
 
 ### Approval Actions
 - `POST /api/ai/approve` - Approve an action
@@ -121,7 +124,6 @@ State-based approval system:
 - UI components updated to show agent outcomes
 - Manual actions still available but de-emphasized
 - Activity Timeline is the single source of truth
-
-
+- Agent loop auto-starts in production
 
 

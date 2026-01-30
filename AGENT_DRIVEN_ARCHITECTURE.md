@@ -56,6 +56,14 @@ State-based approval system:
 - Executes action after approval
 - Records rejections for autonomy adjustment
 
+### 6. Inbox Automation (`ai/inbox_automation.js`)
+Runs on `NEW_EMAIL_RECEIVED`:
+- Classifies email intent (lead, task, question, urgent, noise)
+- Extracts tasks and creates them (with confidence/approval flow)
+- Drafts replies and sends or queues for approval
+- Schedules follow-ups and updates CRM for leads
+- Logs every step to Activity Timeline
+
 ## Execution Flow
 
 1. **Event Occurs** (e.g., new email received)
@@ -125,5 +133,4 @@ State-based approval system:
 - Manual actions still available but de-emphasized
 - Activity Timeline is the single source of truth
 - Agent loop auto-starts in production
-
-
+- Dashboard briefing shows handled items, approvals needed, and urgent items

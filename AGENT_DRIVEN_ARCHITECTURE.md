@@ -64,6 +64,11 @@ Runs on `NEW_EMAIL_RECEIVED`:
 - Schedules follow-ups and updates CRM for leads
 - Logs every step to Activity Timeline
 
+### 7. Activity Logger (`lib/activity_logger.js`)
+- `logActivity(userId, action, agentName, status, metadata)` writes to ActivityLog
+- Used by agent_manager, inbox_automation, and agent_loop
+- Dashboard briefing reads recent logs via `/api/dashboard/briefing`
+
 ## Execution Flow
 
 1. **Event Occurs** (e.g., new email received)
@@ -124,6 +129,9 @@ Runs on `NEW_EMAIL_RECEIVED`:
 ### Approval Actions
 - `POST /api/ai/approve` - Approve an action
 - `POST /api/ai/reject` - Reject an action
+
+### Dashboard
+- `GET /api/dashboard/briefing` - Returns today’s summary, activities, pending approvals, urgent items (used by AI COO Briefing UI)
 
 ## Notes
 

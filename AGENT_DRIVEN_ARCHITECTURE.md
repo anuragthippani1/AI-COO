@@ -96,8 +96,8 @@ Runs on `NEW_EMAIL_RECEIVED`:
 ### Activity Timeline
 - Source of truth for all agent actions
 - Shows: what, when, why, confidence, risk
-- Groups by time (Today, Yesterday, This Week)
-- Filters: All, Handled by AI, Needs Approval, Risks
+- Groups by time: Today, Yesterday, This Week, Older
+- Filters: All, Handled by AI, Needs Approval, Risks / Alerts
 
 ## TODO Items
 
@@ -132,6 +132,10 @@ Runs on `NEW_EMAIL_RECEIVED`:
 
 ### Dashboard
 - `GET /api/dashboard/briefing` - Returns today’s summary, activities, pending approvals, urgent items (used by AI COO Briefing UI)
+
+### Time-Based Automation (cron-triggered)
+- `POST /api/automation/daily-summary` - Generate daily AI COO summary
+- `POST /api/automation/weekly-planner` - Generate weekly planner
 
 ## Notes
 

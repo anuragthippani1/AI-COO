@@ -130,6 +130,10 @@ Runs on `NEW_EMAIL_RECEIVED`:
 - `POST /api/ai/approve` - Approve an action
 - `POST /api/ai/reject` - Reject an action
 
+### Activity
+- `GET /api/activity/logs` - List activity logs (used by Activity Timeline)
+- `POST /api/activity/rollback` - Rollback an agent action
+
 ### Dashboard
 - `GET /api/dashboard/briefing` - Returns today’s summary, activities, pending approvals, urgent items (used by AI COO Briefing UI)
 
@@ -146,3 +150,6 @@ Runs on `NEW_EMAIL_RECEIVED`:
 - Activity Timeline is the single source of truth
 - Agent loop auto-starts in production
 - Dashboard briefing shows handled items, approvals needed, and urgent items
+
+## Related
+- `TESTING_GUIDE.md` - How to test the agent-driven system

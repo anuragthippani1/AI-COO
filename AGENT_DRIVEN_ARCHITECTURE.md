@@ -96,6 +96,22 @@ Runs on `NEW_EMAIL_RECEIVED`:
 7. **User Approves/Rejects** → Action executed or cancelled
 8. **Activity Logged** → All actions logged to Activity Timeline
 
+## Confidence & Risk
+
+Actions are evaluated based on:
+
+- **Confidence Score** (0-100): How certain the AI is about the action
+  - High (≥85): Usually auto-executed (depends on autonomy level)
+  - Medium (75-84): May require approval
+  - Low (<75): Requires approval or is paused
+
+- **Risk Level**: `low`, `medium`, `high`
+  - Low risk: Routine actions (create task, schedule follow-up)
+  - Medium risk: External communication (send email, WhatsApp)
+  - High risk: Financial actions (create invoice, send payment)
+
+The combination of confidence, risk, and autonomy level determines whether an action is auto-executed or requires approval.
+
 ## UI Changes
 
 ### Deprecated / De-emphasized Manual Actions

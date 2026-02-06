@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns'
 
@@ -10,11 +10,7 @@ export default function PlannerPage() {
   const [error, setError] = useState('')
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }))
 
-  useEffect(() => {
-    fetchSchedule()
-  }, [weekStart])
-
-  const fetchSchedule = async () => {
+  const fetchSchedule = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -36,7 +32,11 @@ export default function PlannerPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [weekStart])
+
+  useEffect(() => {
+    fetchSchedule()
+  }, [fetchSchedule])
 
   const generateSchedule = async () => {
     try {

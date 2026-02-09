@@ -184,7 +184,7 @@ export default function PlannerPage() {
                       {dayMeetings.map((meeting, idx) => (
                         <div
                           key={idx}
-                          className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs"
+                          className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 cursor-pointer"
                         >
                           <div className="font-medium text-blue-900">{meeting.title}</div>
                           <div className="text-blue-700">
@@ -196,7 +196,7 @@ export default function PlannerPage() {
                       {dayTasks.map((task, idx) => (
                         <div
                           key={idx}
-                          className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"
+                          className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 cursor-pointer"
                         >
                           <div className="font-medium text-gray-900">{task.title}</div>
                           {task.priority && (

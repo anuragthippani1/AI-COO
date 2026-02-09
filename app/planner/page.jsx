@@ -92,7 +92,9 @@ export default function PlannerPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Weekly Planner</h1>
-            <p className="text-gray-600 mt-1">AI-generated weekly schedule</p>
+            <p className="text-gray-600 mt-1">
+              {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')} • AI-generated schedule
+            </p>
           </div>
           <div className="flex gap-2">
             <button

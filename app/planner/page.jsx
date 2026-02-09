@@ -55,6 +55,7 @@ export default function PlannerPage() {
       if (response.ok) {
         const data = await response.json()
         setSchedule(data.schedule)
+        setError('') // Clear any previous errors
       } else {
         const errorData = await response.json().catch(() => ({}))
         setError(errorData.error || 'Failed to generate schedule')

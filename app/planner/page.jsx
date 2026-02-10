@@ -154,6 +154,16 @@ export default function PlannerPage() {
             )}
 
             {/* Weekly Grid */}
+            <div className="flex items-center justify-end gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-blue-50 border border-blue-300" />
+                <span>Meetings</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-gray-50 border border-gray-300" />
+                <span>Tasks</span>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
               {weekDays.map((day, index) => {
                 const dayTasks = getTasksForDay(day)

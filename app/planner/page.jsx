@@ -99,18 +99,21 @@ export default function PlannerPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setWeekStart(addDays(weekStart, -7))}
+              aria-label="View previous week"
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
             >
               ← Previous
             </button>
             <button
               onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+              aria-label="Jump to current week"
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
             >
               This Week
             </button>
             <button
               onClick={() => setWeekStart(addDays(weekStart, 7))}
+              aria-label="View next week"
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
             >
               Next →
@@ -118,6 +121,7 @@ export default function PlannerPage() {
             <button
               onClick={generateSchedule}
               disabled={loading}
+              aria-label={loading ? 'Generating weekly schedule' : 'Generate weekly schedule'}
               className="px-4 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
               {loading ? 'Generating...' : '🤖 Generate Schedule'}

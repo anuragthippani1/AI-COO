@@ -182,8 +182,15 @@ export default function PlannerPage() {
                     }`}
                   >
                     <div className="mb-4">
-                      <div className="text-xs font-medium text-gray-500 uppercase mb-1">
-                        {format(day, 'EEE')}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs font-medium text-gray-500 uppercase">
+                          {format(day, 'EEE')}
+                        </div>
+                        {(dayTasks.length > 0 || dayMeetings.length > 0) && (
+                          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-full">
+                            {dayTasks.length + dayMeetings.length}
+                          </span>
+                        )}
                       </div>
                       <div
                         className={`text-lg font-bold ${

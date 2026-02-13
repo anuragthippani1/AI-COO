@@ -130,8 +130,16 @@ export default function PlannerPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm">
-            {error}
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm flex items-start justify-between gap-3">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={() => setError('')}
+              aria-label="Dismiss error"
+              className="text-red-600 hover:text-red-800 shrink-0"
+            >
+              ×
+            </button>
           </div>
         )}
 

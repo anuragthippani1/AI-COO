@@ -96,7 +96,7 @@ export default function PlannerPage() {
               {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')} • AI-generated schedule
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setWeekStart(addDays(weekStart, -7))}
               aria-label="View previous week"
@@ -117,6 +117,14 @@ export default function PlannerPage() {
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
             >
               Next →
+            </button>
+            <button
+              onClick={fetchSchedule}
+              disabled={loading}
+              aria-label="Refresh schedule"
+              className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Refresh
             </button>
             <button
               onClick={generateSchedule}

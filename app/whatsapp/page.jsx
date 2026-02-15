@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { format } from 'date-fns'
 
@@ -16,53 +17,55 @@ export default function WhatsAppPage() {
   const [isConfigured, setIsConfigured] = useState(false)
   const messagesEndRef = useRef(null)
 
-  useEffect(() => {
-    checkConfiguration()
-    loadConversations()
-  }, [])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const checkConfiguration = async () => {
+  const checkConfiguration = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
       const response = await fetch('/api/settings/integrations', {
         headers: { Authorization: `Bearer ${token}` },
       })
-
       if (response.ok) {
         const data = await response.json()
         setIsConfigured(data.integrations?.whatsapp?.configured || false)
       }
-    } catch (error) {
-      console.error('Error checking configuration:', error)
+    } catch (err) {
+      console.error('Error checking configuration:', err)
     }
-  }
+  }, [])
 
-  const loadConversations = () => {
-    // Load conversations from localStorage (you can replace with API call)
+  const loadConversations = useCallback(() => {
     const stored = localStorage.getItem('whatsapp_conversations')
     if (stored) {
       const convs = JSON.parse(stored)
       setConversations(convs)
-      if (convs.length > 0 && !selectedConversation) {
-        setSelectedConversation(convs[0])
-        loadMessages(convs[0].phoneNumber)
+      if (convs.length > 0) {
+        setSelectedConversation((prev) => prev || convs[0])
       }
     }
-  }
+  }, [])
 
-  const loadMessages = (phone) => {
-    // Load messages from localStorage (you can replace with API call)
+  useEffect(() => {
+    checkConfiguration()
+    loadConversations()
+  }, [checkConfiguration, loadConversations])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const loadMessages = useCallback((phone) => {
     const stored = localStorage.getItem(`whatsapp_messages_${phone}`)
     if (stored) {
       setMessages(JSON.parse(stored))
     } else {
       setMessages([])
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (selectedConversation?.phoneNumber) {
+      loadMessages(selectedConversation.phoneNumber)
+    }
+  }, [selectedConversation?.phoneNumber, loadMessages])
 
   const saveConversation = (phone, name) => {
     const conv = {
@@ -191,15 +194,23 @@ export default function WhatsAppPage() {
               <strong>WhatsApp not configured:</strong> Please add{' '}
               <code className="bg-yellow-100 px-1 rounded">WHATSAPP_ACCESS_TOKEN</code> and{' '}
               <code className="bg-yellow-100 px-1 rounded">WHATSAPP_PHONE_NUMBER_ID</code> to your{' '}
-              <code className="bg-yellow-100 px-1 rounded">.env</code> file. See Settings → Integrations for details.
+              <code className="bg-yellow-100 px-1 rounded">.env</code> file.{' '}
+              <Link href="/settings" className="text-blue-600 hover:text-blue-800 font-medium underline">
+                Settings → Integrations
+              </Link>
             </p>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-start">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-start gap-3">
             <p className="text-red-800 text-sm">{error}</p>
-            <button onClick={() => setError('')} className="text-red-600 hover:text-red-800 ml-4">
+            <button
+              type="button"
+              onClick={() => setError('')}
+              aria-label="Dismiss error"
+              className="text-red-600 hover:text-red-800 shrink-0"
+            >
               ×
             </button>
           </div>
@@ -219,8 +230,9 @@ export default function WhatsAppPage() {
             </div>
             <div className="flex-1 overflow-y-auto">
               {conversations.length === 0 ? (
-                <div className="p-4 text-center text-gray-500 text-sm">
-                  No conversations yet
+                <div className="p-6 text-center text-gray-500 text-sm">
+                  <p className="mb-1">No conversations yet</p>
+                  <p className="text-xs text-gray-400">Enter a phone number below and send a message to start</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-200">
@@ -335,6 +347,7 @@ export default function WhatsAppPage() {
                 <button
                   onClick={sendMessage}
                   disabled={loading || !newMessage.trim() || !phoneNumber.trim()}
+                  aria-label={loading ? 'Sending message' : 'Send message'}
                   className="px-6 py-2 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   {loading ? 'Sending...' : 'Send'}

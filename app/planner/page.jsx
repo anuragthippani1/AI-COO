@@ -222,6 +222,9 @@ export default function PlannerPage() {
                         <div
                           key={idx}
                           className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Meeting: ${meeting.title} at ${format(new Date(meeting.startTime), 'h:mm a')}`}
                         >
                           <div className="font-medium text-blue-900">{meeting.title}</div>
                           <div className="text-blue-700">
@@ -234,6 +237,9 @@ export default function PlannerPage() {
                         <div
                           key={idx}
                           className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Task: ${task.title}${task.priority ? `, Priority: ${task.priority}` : ''}`}
                         >
                           <div className="font-medium text-gray-900">{task.title}</div>
                           {task.priority && (
@@ -245,7 +251,9 @@ export default function PlannerPage() {
                       ))}
 
                       {dayTasks.length === 0 && dayMeetings.length === 0 && (
-                        <div className="text-xs text-gray-400 text-center py-4">No items</div>
+                        <div className="text-xs text-gray-400 text-center py-4" aria-label="No scheduled items">
+                          No items
+                        </div>
                       )}
                     </div>
                   </div>

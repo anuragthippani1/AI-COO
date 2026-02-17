@@ -138,7 +138,11 @@ export default function PlannerPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm flex items-start justify-between gap-3">
+          <div
+            className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm flex items-start justify-between gap-3"
+            role="alert"
+            aria-live="polite"
+          >
             <span>{error}</span>
             <button
               type="button"

@@ -275,6 +275,7 @@ export default function PlannerPage() {
             <button
               onClick={generateSchedule}
               disabled={loading}
+              aria-label={loading ? 'Generating weekly schedule' : 'Generate weekly schedule'}
               className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
               {loading ? 'Generating...' : '🤖 Generate Schedule'}

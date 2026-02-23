@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { format } from 'date-fns'
@@ -14,11 +14,7 @@ export default function InboxPage() {
   const [success, setSuccess] = useState('')
   const [filter, setFilter] = useState('all') // all, unread, read
 
-  useEffect(() => {
-    fetchEmails(false)
-  }, [])
-
-  const fetchEmails = async (fromGmail = false) => {
+  const fetchEmails = useCallback(async (fromGmail = false) => {
     try {
       if (fromGmail) {
         setFetching(true)
@@ -85,7 +81,11 @@ export default function InboxPage() {
       setLoading(false)
       setFetching(false)
     }
-  }
+  }, [filter])
+
+  useEffect(() => {
+    fetchEmails(false)
+  }, [fetchEmails])
 
   const markAsRead = async (emailId) => {
     try {

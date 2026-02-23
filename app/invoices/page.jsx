@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -20,11 +20,7 @@ export default function InvoicesPage() {
     dueDate: '',
   })
 
-  useEffect(() => {
-    fetchInvoices()
-  }, [statusFilter])
-
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -47,7 +43,11 @@ export default function InvoicesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter])
+
+  useEffect(() => {
+    fetchInvoices()
+  }, [fetchInvoices])
 
   const createInvoice = async () => {
     if (!newInvoice.clientName.trim()) {

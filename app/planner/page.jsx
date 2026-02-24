@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns'
 
@@ -70,7 +70,10 @@ export default function PlannerPage() {
     }
   }
 
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const weekDays = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
+    [weekStart],
+  )
 
   const getTasksForDay = (day) => {
     if (!schedule?.tasks) return []

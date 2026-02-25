@@ -230,9 +230,7 @@ export default function PlannerPage() {
                       {dayMeetings.map((meeting, idx) => (
                         <div
                           key={idx}
-                          className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 cursor-pointer"
-                          role="button"
-                          tabIndex={0}
+                          className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
                           aria-label={`Meeting: ${meeting.title} at ${format(new Date(meeting.startTime), 'h:mm a')}`}
                         >
                           <div className="font-medium text-blue-900">{meeting.title}</div>
@@ -245,9 +243,7 @@ export default function PlannerPage() {
                       {dayTasks.map((task, idx) => (
                         <div
                           key={idx}
-                          className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 cursor-pointer"
-                          role="button"
-                          tabIndex={0}
+                          className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
                           aria-label={`Task: ${task.title}${task.priority ? `, Priority: ${task.priority}` : ''}`}
                         >
                           <div className="font-medium text-gray-900">{task.title}</div>

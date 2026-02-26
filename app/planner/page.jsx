@@ -93,7 +93,7 @@ export default function PlannerPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 md:p-8 space-y-6">
+      <div className="p-6 md:p-8 space-y-6" aria-busy={loading}>
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Weekly Planner</h1>

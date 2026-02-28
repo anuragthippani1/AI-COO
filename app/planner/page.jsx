@@ -161,8 +161,8 @@ export default function PlannerPage() {
         )}
 
         {loading && !schedule ? (
-          <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"></div>
+          <div className="text-center py-12" role="status" aria-live="polite" aria-label="Loading weekly schedule">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4" aria-hidden />
             <p className="text-gray-500">Loading schedule...</p>
           </div>
         ) : schedule ? (

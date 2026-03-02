@@ -112,7 +112,7 @@ export default function CRMPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 md:p-8 space-y-6">
+      <div className="p-6 md:p-8 space-y-6" aria-busy={loading}>
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">CRM / Leads</h1>
@@ -143,16 +143,29 @@ export default function CRMPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-start">
+          <div
+            className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-start gap-3"
+            role="alert"
+            aria-live="polite"
+          >
             <p className="text-red-800 text-sm">{error}</p>
-            <button onClick={() => setError('')} className="text-red-600 hover:text-red-800 ml-4">
+            <button
+              type="button"
+              onClick={() => setError('')}
+              aria-label="Dismiss error"
+              className="text-red-600 hover:text-red-800 ml-4 shrink-0"
+            >
               ×
             </button>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 text-sm">
+          <div
+            className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 text-sm"
+            role="status"
+            aria-live="polite"
+          >
             {success}
           </div>
         )}

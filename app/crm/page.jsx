@@ -172,6 +172,21 @@ export default function CRMPage() {
 
         {loading ? (
           <div className="text-center py-12">Loading leads...</div>
+        ) : leads.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center shadow-sm">
+            <div className="text-5xl mb-4">👥</div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">No leads yet</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Your AI COO will create leads automatically from your inbox and WhatsApp activity.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              + Add manual lead
+            </button>
+          </div>
         ) : view === 'kanban' ? (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 overflow-x-auto">
             {stages.map((stage) => (

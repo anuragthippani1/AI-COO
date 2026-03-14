@@ -173,7 +173,15 @@ export default function CRMPage() {
         )}
 
         {loading ? (
-          <div className="text-center py-12">Loading leads...</div>
+          <div
+            className="text-center py-12"
+            role="status"
+            aria-live="polite"
+            aria-label="Loading leads"
+          >
+            <div className="animate-spin h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4" aria-hidden />
+            <p className="text-gray-500">Loading leads...</p>
+          </div>
         ) : leads.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-10 text-center shadow-sm">
             <div className="text-5xl mb-4">👥</div>

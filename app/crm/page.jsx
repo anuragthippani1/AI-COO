@@ -203,11 +203,14 @@ export default function CRMPage() {
               <div key={stage} className="bg-white rounded-xl border border-gray-200 p-4 min-w-[200px]">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900 capitalize">{stage.replace('_', ' ')}</h3>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  <span className={`text-xs px-2 py-1 rounded-full border ${getStageColor(stage)}`}>
                     {getLeadsByStage(stage).length}
                   </span>
                 </div>
                 <div className="space-y-2">
+                  {getLeadsByStage(stage).length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-6">No leads</p>
+                  )}
                   {getLeadsByStage(stage).map((lead) => (
                     <div
                       key={lead.id}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { format } from 'date-fns'
 
@@ -22,11 +22,7 @@ export default function CRMPage() {
     notes: '',
   })
 
-  useEffect(() => {
-    fetchLeads()
-  }, [])
-
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -43,7 +39,11 @@ export default function CRMPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchLeads()
+  }, [fetchLeads])
 
   const createLead = () => {
     if (!newLead.name.trim() || !newLead.email.trim()) {
@@ -129,14 +129,14 @@ export default function CRMPage() {
             <button
               onClick={() => setView(view === 'kanban' ? 'list' : 'kanban')}
               aria-label={view === 'kanban' ? 'Switch to list view' : 'Switch to kanban view'}
-              className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+              className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
             >
               {view === 'kanban' ? '📋 List View' : '📊 Kanban View'}
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
               aria-label="Add manual lead"
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2 text-sm"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 flex items-center gap-2 text-sm font-medium"
               title="Most leads are detected automatically from emails"
             >
               <span>+</span> Manual Lead

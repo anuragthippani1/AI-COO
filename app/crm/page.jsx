@@ -214,19 +214,25 @@ export default function CRMPage() {
                   {getLeadsByStage(stage).map((lead) => (
                     <div
                       key={lead.id}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:border-gray-300 transition-colors"
+                      className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:border-blue-200 hover:shadow-sm transition-all duration-200"
                     >
-                      <h4 className="font-medium text-gray-900 text-sm mb-1">{lead.name}</h4>
-                      <p className="text-xs text-gray-500 mb-2">{lead.email}</p>
+                      <h4 className="font-medium text-gray-900 text-sm mb-1 truncate">{lead.name}</h4>
+                      <p className="text-xs text-gray-500 mb-2 truncate">{lead.email}</p>
                       {lead.company && (
-                        <p className="text-xs text-gray-400 mb-2">{lead.company}</p>
+                        <p className="text-xs text-gray-400 mb-2 truncate">{lead.company}</p>
                       )}
-                      <div className="flex gap-1 mt-2">
+                      {(lead.source === 'email' || lead.source === 'ai_detected') && (
+                        <span className="inline-block text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 mb-2">
+                          AI-detected
+                        </span>
+                      )}
+                      <div className="flex gap-1 mt-2 flex-wrap">
                         {stages.map((s) => (
                           <button
                             key={s}
                             onClick={() => updateLeadStage(lead.id, s)}
-                            className={`text-xs px-2 py-1 rounded ${
+                            aria-label={`Move ${lead.name} to ${s.replace('_', ' ')}`}
+                            className={`text-xs px-2 py-1 rounded transition-colors ${
                               lead.stage === s
                                 ? 'bg-gray-900 text-white'
                                 : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
@@ -238,7 +244,9 @@ export default function CRMPage() {
                         ))}
                       </div>
                       <button
+                        type="button"
                         onClick={() => deleteLead(lead.id)}
+                        aria-label={`Delete lead ${lead.name}`}
                         className="text-xs text-red-600 hover:text-red-800 mt-2"
                       >
                         Delete
